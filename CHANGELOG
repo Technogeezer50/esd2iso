@@ -1,0 +1,21 @@
+CHANGELOG
+
+Version 1.0 - Initial release
+
+Version 2.0 (15-Mar-2023)
+
+	Enhanced error detection.
+	
+	Reduction of "chatty" output when the -v (verbose) option is not selected. 
+	
+	The -v (verbose) option now includes more information for use in debugging
+	(and if you're really interested in what goes on under the hood).
+	
+	Addition of -V option to print the script version and exit.
+	
+	When using the -a option, the script will now retry an interrupted ESD download 
+	up to 20 times before aborting the script. This should reduce the need to use the 
+	-r option to restart interrupted ESD downloads due to network issues.
+	
+	Some internal changes for efficiency.
+	

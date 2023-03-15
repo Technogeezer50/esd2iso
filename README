@@ -1,25 +1,27 @@
-README for w11arm_esd2iso 1.0 (1-Mar-2023)
+README for w11arm_esd2iso 2.0 (15-Mar-2023)
 
 This script is designed to create ISO installation media for Windows 11 ARM on macOS from ESD
 files in Microsoft's software distribution infrastructure.
-Use this ISO file to install Windows 11 virtual machines on VMware Fusion 13 on Apple Silicon. 
+This ISO can be used to install Windows 11 virtual machines on VMware Fusion 13 on 
+Apple Silicon. 
 
 This script will not be necessary when either Microsoft provides a Windows 11 ARM ISO 
-for end-user download or VMware provides a way to create the ISO in their Fusion product like
-Parallels does.
+for end-user download or VMware provides a way to create the ISO in their Fusion product 
+like Parallels does.
 
 Contents of the downloaded zip file:
 
-	- README - contains more info on the script, including a man(1) like reference
-	- w11arm_esd2iso.sh
+	- README - (this document, the primary documentation for the script)
+	- CHANGELOG (contains a summary of changes) 
+	- w11arm_esd2iso.sh (the script)
 
 NAME
 	w11arm_esd2iso.sh - build Windows 11 ARM ISOs from Microsoft ESD files
 
 SYNOPSIS
-	w11arm_esd2iso.sh [-a] [-v] [-h] language-tag
-	w11arm_esd2iso.sh -r work-dir
-	w11arm_esd2iso.sh -l
+	w11arm_esd2iso.sh [-abhvV] language-tag
+	w11arm_esd2iso.sh [-vVh] -r work-dir
+	w11arm_esd2iso.sh [-vVh] -l
 
 DESCRIPTION
 	In the first form, w11arm_esd2iso downloads the the ESD file for Windows 11 ARM 22H2
@@ -27,11 +29,15 @@ DESCRIPTION
 	and converts it to ISO. This ISO can be used to install Windows 11 ARM on physical
 	or virtual machines.
 	
+	By default, a "Consumer" (Home/Pro) ISO will be built. Use the -b option to build
+	a "Business" (Pro/Enterprise) ISO.
+	
 	The generated ISO file is placed in the current working directory. The script
 	will display the name of the generated ISO file.
 	
-	In the second form, the script resumes a failed network transfer of the ESD
-	from Microsoft and continues the ISO build process. 
+	In the second form, the -r option resumes a failed network transfer of the ESD
+	from Microsoft and continues the ISO build process. The work-dir argument is required, 
+	and is expected to be the work directory created from a prior failed run of the script.
 	
 	In the third form, the script prints a list of recognized Windows 11 language tags.
 	These tags can be used for the language-tag specification in the first form of the
@@ -39,8 +45,12 @@ DESCRIPTION
 	
 OPTIONS
 	-a		
-	    Use aria2c for download of the ESD file instead of curl.  
-
+	    Use aria2c(1) for download of the ESD file instead of curl(1). 
+	    
+	-b		
+	    Create an ISO for "Business" (Pro/Enterpise) editions rather than 
+	    "Consumer" (Home/Pro) editions
+ 
 	-h		
 	    Print usage and exit
 
@@ -54,29 +64,33 @@ OPTIONS
 			
   	-v	
   		Enable verbose output. Use only when providing debugging output.
+  		
+  	-V	
+  		Print the version of the script and exit.
+
 
 FILES
-	./esd2iso_work.*	Work directory for ESD download and image creation,
-				located in the current working directory.
+	./esd2iso_work.*	
+		Work directory for ESD download and image creation, located in the current 
+		working directory.
 
-				This directory will be deleted upon successful ISO
-				creation and when most errors are encountered. It
-				will not be deleted if a transfer of the ESD can be
-				restarted, or if the final phase of the ESD creation
-				fails.  
+		This directory will be deleted upon successful ISO creation and when most 
+		errors are encountered. It will not be deleted if a transfer of the ESD can be
+		restarted using the -r option , or if the final phase of the ESD creation
+		fails.  
 	
 DEPENDENCIES
 	w11arm_esd2iso.sh depends on utilities found in the open-source wimlib package,
 	and expects those utilities to be accessible through $PATH. The wimlib package
 	can be installed from either Homebrew or MacPorts.
 	
-	If the -a option is used to optionally use aria2c instead of curl for the
-	download of the ESD from Microsoft, the open-source aria2 packages must be
+	If the -a option is used to optionally use aria2c(1) instead of curl(1) for the
+	download of the ESD from Microsoft, the open-source aria2 package must be
 	installed from either Homebrew or MacPorts.
 	
 EXIT STATUS
 
-	0		Successful creation of the ISO file
+	0			Successful creation of the ISO file
 	Non-zero 	Unsuccessful creation of the ISO file
 	
 NOTES
@@ -86,18 +100,22 @@ NOTES
 	for what it considers to be sufficient space and will refuse to run if it isn't
 	available. 
 	
-	This script only builds ISO media for Windows 11 ARM Professional, which includes 
-	Windows 11 Home. It does not build media for any other Windows version, architecture,
-	or edition.
+	Without the -a option, an interruption in the download of the ESD due to network
+	issues will require the entire download to be processed from the beginning.
+	
+	With the -a option, retry and restart features are enabled that allow an interrupted
+	download to be resumed from the point of interruption.  The script will automatically
+	retry an interrupted download up to 20 times (each retry resuming from the point of 
+	interruption). After 20 retries, the script will exit, and will display a command 
+	(using the -r option) that can be copy/pasted to resume the ESD download.
+		
+	This script only builds ISO media for Windows 11 ARM. It does not build media 
+	for any other CPU architecture or version of Windows.
 
-	More complete guidance on the use of this script to create Windows 11 SO media 
+	More extensive guidance on the use of this script to create Windows 11 ISO media 
 	suitable for use with VMware Fusion 13 on Apple Silicon can be found in the 
 	Unofficial Fusion 13 for Apple Silicon Companion Guide which is found at
 	https://communities.vmware.com/t5/VMware-Fusion-Documents/The-Unofficial-Fusion-13-for-Apple-Silicon-Companion-Guide/ta-p/2939907
-
-	Consider running with the -a option to use aria2c to download the ESD. 
-	aria2c seems to have better resiliency to network conditions than using the curl 
-	method.
 
 AUTHOR
 	Paul Rockwell (@Technogeezer on VMware Fusion Discussions forum)
