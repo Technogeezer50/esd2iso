@@ -320,27 +320,6 @@ buildIso(){
 #-------------------
 
 
-
-#-------------------
-# Check for for wiminfo, wimapply and wimexport 
-#
-# all of these are from open source package wimlib
-# Warn the user if any of them are not here and abort
-#-------------------
-
-notFound=0
-for i in $requires; do
-    which -s $i
-    if [ $? -ne 0 ]; then
-      echo "ERROR: Required program $i not found"
-      notFound=1
-    fi
-done
-if [ $notFound -eq 1 ]; then
-      echo "ERROR: One or more required programs are not found."
-      exit 1
-fi 
-
 #-------------------
 # 
 # Process arguments
@@ -436,6 +415,52 @@ if [ $lOption -eq 1 ]; then
 fi
 
 #-------------------
+# Check for for wiminfo, wimapply and wimexport 
+#
+# all of these are from open source package wimlib
+# Warn the user if any of them are not here and abort
+#-------------------
+
+cmdPath=""
+for utilPath in "/opt/homebrew/bin" "/opt/local/bin" "/usr/local/bin"; do
+	if [ -d "$utilPath" ]; then
+		cmdPath="${utilPath}"
+		verboseOn && echo "Utility path is $utilPath"
+		break
+	fi;
+done
+if [ "x$cmdPath" = "x" ]; then
+	echo "ERROR: Neither Homebrew or MacPorts appear to be installed"
+	echo "Please install one of them and then install required packages"
+	exit 1
+fi
+
+# 
+# If for some reason the user has installed Homebrew or MacPorts, but has not
+# put the base directory into $PATH, lets do it for them
+#
+
+echo $PATH | grep -E "$cmdPath"'((:)|($))'
+if [ $? -ne 0 ]; then
+	verboseOn && echo "NOTE: $cmdPath exists, but isn't on shell's PATH. Adding it."
+	PATH="${cmdPath}:${PATH}"
+	verboseOn && echo "Path is now set to $PATH"	
+fi
+
+notFound=0
+for i in $requires; do
+    which -s $i
+    if [ $? -ne 0 ]; then
+      echo "ERROR: Required program $i not found"
+      notFound=1
+    fi
+done
+if [ $notFound -eq 1 ]; then
+      echo "Please install required packages from Homebrew or MacPorts"
+      exit 1
+fi 
+
+#-------------------
 #
 # If the -a option was specified, see if aria2c exists
 # If we are doing a restart and aria2c doesn't exist, error out since a restartable
@@ -449,7 +474,6 @@ if [ $aOption -eq 1 ]; then
 	which -s aria2c
 	if [ $? -eq 0 ]; then
 		downloadApp="aria2c"
-
 	else
 		if [ $rOption -eq 1 ]; then
 			echo "ERROR: Download restart requested, but aria2c can not be found"
