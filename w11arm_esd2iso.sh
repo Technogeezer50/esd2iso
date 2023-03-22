@@ -16,7 +16,7 @@ lOption=0
 rOption=0
 langCodes=""
 
-version="w11arm_esd2iso 2.0 (15-Mar-2023)\n"
+version="w11arm_esd2iso 2.1 (22-Mar-2023)\n"
 requires="wiminfo wimapply wimexport"
 
 usage() {
@@ -32,7 +32,7 @@ usage() {
   echo "\t-h\tPrint usage and exit"
   echo "\t-v\tEnable verbose output"
   echo "\t-V\tPrint script version and exit"
-  echo "\t-r work-dir\n\t\tRestart failed ESD download from a prior execution using work-dir"
+  echo "\t-r work-dir\n\t\tRestart the failed ESD download from a prior execution using work-dir"
 }
 printVersion() {
 	echo $version
@@ -313,6 +313,8 @@ buildIso(){
 	hdiutil makehybrid -o $iFile -iso -udf -hard-disk-boot -eltorito-boot $elToritoBootFile $iDir
 	return $?
 }
+
+
 #-------------------
 #
 # Start of program
@@ -368,6 +370,10 @@ while getopts ":abhlr:vV" opt; do
 done
 shift "$((OPTIND-1))"
 
+
+verboseOn && printVersion
+
+
 #-------------------
 #
 # Check number of arguments
@@ -390,8 +396,8 @@ if [ $rOption -eq 0 -a $lOption -eq 0 ]; then
 	fi
 fi
 if [ $rOption -eq 1 ]; then
-	if [ $lOption -eq 1 -o  $aOption -eq 1 ]; then
-		echo "ERROR: the -a and -l options can not be used with the -r option"
+	if [ $lOption -eq 1 ]; then
+		echo "ERROR: the -l option can not be used with the -r option"
 		usage
 		exit 1
 	fi
@@ -400,6 +406,10 @@ if [ $rOption -eq 1 ]; then
 		usage
 		exit 1
 	fi
+	if [ $aOption -eq 1 ]; then
+		echo "NOTE: -a option is implied with -r, no need to specify it"
+	fi;
+	aOption=1
 fi
 if [ $lOption -eq 1 ]; then
 	if [ $rOption -eq 1  -o  $aOption -eq 1  ]; then
@@ -483,7 +493,6 @@ if [ $aOption -eq 1 ]; then
 		    echo "WARNING: aria2c not found, -a option ignored"
 		    aOption=0
 		fi
-
    	fi
 fi
 

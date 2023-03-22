@@ -1,7 +1,7 @@
-README for w11arm_esd2iso 2.0 (15-Mar-2023)
+README for w11arm_esd2iso 2.1 (22-Mar-2023)
 
-This script is designed to create ISO installation media for Windows 11 ARM on macOS from ESD
-files in Microsoft's software distribution infrastructure.
+This script is designed to create ISO installation media for Windows 11 ARM from 
+ESD files in Microsoft's software distribution infrastructure.
 This ISO can be used to install Windows 11 virtual machines on VMware Fusion 13 on 
 Apple Silicon. 
 
@@ -24,8 +24,8 @@ SYNOPSIS
 	w11arm_esd2iso.sh [-vVh] -l
 
 DESCRIPTION
-	In the first form, w11arm_esd2iso downloads the the ESD file for Windows 11 ARM 22H2
-	Professional (includes Windows 11 Home) for the selected language-tag from Microsoft,
+	In the first form, a Windows 11 ARM 22H2 ESD (Electronic 
+	Software Distribution) file for for the selected language-tag from Microsoft,
 	and converts it to ISO. This ISO can be used to install Windows 11 ARM on physical
 	or virtual machines.
 	
@@ -55,7 +55,7 @@ OPTIONS
 	    Print usage and exit
 
 	-l
-	    Print a list of valid language-tags and their corresponding languages
+	    Print a list of valid language-tags and their corresponding languages and exit.
 
 	-r work-dir
 	    Resume an interrupted ESD download using the information from the work directory
@@ -95,6 +95,8 @@ EXIT STATUS
 	
 NOTES
 	The script must be made executable after extraction from the zip file.
+	
+	This script only runs on macOS.
 
 	Have at least 15GB of free disk space to run this script. The script will check 
 	for what it considers to be sufficient space and will refuse to run if it isn't
@@ -117,6 +119,29 @@ NOTES
 	Unofficial Fusion 13 for Apple Silicon Companion Guide which is found at
 	https://communities.vmware.com/t5/VMware-Fusion-Documents/The-Unofficial-Fusion-13-for-Apple-Silicon-Companion-Guide/ta-p/2939907
 
+EXAMPLES
+
+	./w11arm_esd2iso -l
+	
+		Display a list of supported Windows 11 ARM languages and their associated
+		language tags. 
+
+	./w11arm_esd2iso en-us
+	
+		Download and build the en-us (US English) language ISO of Windows 11 ARM. 
+		No download restart is supported. 
+
+	./w11arm_esd2iso -a en-us
+	
+		Download and build the en-gb (UK English) language ISO of Windows 11 ARM.
+		Restart of interrupted downloads using the -r option are supported.
+		
+	./w11arm_esd2iso -r ./esd2iso_work.abcdef
+	
+		Restart a interrupted download from the point of interruption using the
+		work directory ./esd2iso_work.abcdef left behind from a previous run of the script 
+		that used the -a option.
+		
 AUTHOR
 	Paul Rockwell (@Technogeezer on VMware Fusion Discussions forum)
 	
@@ -138,5 +163,11 @@ SUPPORT
 
 	If you find an error please run the script with the -v option, then attach the entire
 	output of the script in a zip file to your post.
+	
+TODO
+	It shouldn't be too hard to modify this script to run on Linux. There are no
+	intentions to make this script run on Windows.
+
+
 	
 

@@ -19,3 +19,12 @@ Version 2.0 (15-Mar-2023)
 	
 	Some internal changes for efficiency.
 	
+Version 2.1 (22-Mar-2023)
+
+	Additional checks for required utilities. 
+	
+	Check if $PATH contains the Homebrew or MacPorts directores. Add them if
+	they are present and are not on $PATH already.
+	
+	Examples now appear in the README file
+	
