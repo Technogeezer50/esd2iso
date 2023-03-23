@@ -27,4 +27,12 @@ Version 2.1 (22-Mar-2023)
 	they are present and are not on $PATH already.
 	
 	Examples now appear in the README file
+
+Version 2.2 (xxx-xxx-2023)	
+
+	Removal of manpage documentation from README
 	
+	Creation of manpage documentation in pdf format
+	
+	Rename of script from w11arm_esd2iso.sh to w11arm_esd2iso
+

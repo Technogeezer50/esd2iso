@@ -1,4 +1,4 @@
-README for w11arm_esd2iso 2.1 (22-Mar-2023)
+README for w11arm_esd2iso 2.2 (22-Mar-2023)
 
 This script is designed to create ISO installation media for Windows 11 ARM from 
 ESD files in Microsoft's software distribution infrastructure.
@@ -13,161 +13,28 @@ Contents of the downloaded zip file:
 
 	- README - (this document, the primary documentation for the script)
 	- CHANGELOG (contains a summary of changes) 
-	- w11arm_esd2iso.sh (the script)
+	- w11arm_esd2iso (the script)
+	- w11arm_esd2iso_manual.pdf (PDF version of documentation in man(1) format.
+	
+You are encouraged to read the w11arm_esd2iso_manual.pdf document which now contains
+the primary documentation for w11arm_esd2iso.
 
-NAME
-	w11arm_esd2iso.sh - build Windows 11 ARM ISOs from Microsoft ESD files
+QUESTIONS?
 
-SYNOPSIS
-	w11arm_esd2iso.sh [-abhvV] language-tag
-	w11arm_esd2iso.sh [-vVh] -r work-dir
-	w11arm_esd2iso.sh [-vVh] -l
+Any questions about this script should be posted to the VMware Fusion forum: 
+https://communities.vmware.com/t5/VMware-Fusion/ct-p/3005-home
 
-DESCRIPTION
-	In the first form, a Windows 11 ARM 22H2 ESD (Electronic 
-	Software Distribution) file for for the selected language-tag from Microsoft,
-	and converts it to ISO. This ISO can be used to install Windows 11 ARM on physical
-	or virtual machines.
-	
-	By default, a "Consumer" (Home/Pro) ISO will be built. Use the -b option to build
-	a "Business" (Pro/Enterprise) ISO.
-	
-	The generated ISO file is placed in the current working directory. The script
-	will display the name of the generated ISO file.
-	
-	In the second form, the -r option resumes a failed network transfer of the ESD
-	from Microsoft and continues the ISO build process. The work-dir argument is required, 
-	and is expected to be the work directory created from a prior failed run of the script.
-	
-	In the third form, the script prints a list of recognized Windows 11 language tags.
-	These tags can be used for the language-tag specification in the first form of the
-	script. 
-	
-OPTIONS
-	-a		
-	    Use aria2c(1) for download of the ESD file instead of curl(1). 
-	    
-	-b		
-	    Create an ISO for "Business" (Pro/Enterpise) editions rather than 
-	    "Consumer" (Home/Pro) editions
- 
-	-h		
-	    Print usage and exit
+FOUND A BUG?
 
-	-l
-	    Print a list of valid language-tags and their corresponding languages and exit.
+If you find an error please report it in a new post in the VMware Fusion forum
+https://communities.vmware.com/t5/VMware-Fusion/ct-p/3005-home 
 
-	-r work-dir
-	    Resume an interrupted ESD download using the information from the work directory
-	    "work-dir". Restart is only available when the original download attempt was
-	    performed with the -a option.
-			
-  	-v	
-  		Enable verbose output. Use only when providing debugging output.
-  		
-  	-V	
-  		Print the version of the script and exit.
+When you report an error, please re-create it by running w11arm_esd2iso with the 
+-v (verbose) option, capture the output in a text document, and create a zip file 
+containing the output. Attach that zip file to your post in the VMware Fusion forum.
 
-
-FILES
-	./esd2iso_work.*	
-		Work directory for ESD download and image creation, located in the current 
-		working directory.
-
-		This directory will be deleted upon successful ISO creation and when most 
-		errors are encountered. It will not be deleted if a transfer of the ESD can be
-		restarted using the -r option , or if the final phase of the ESD creation
-		fails.  
-	
-DEPENDENCIES
-	w11arm_esd2iso.sh depends on utilities found in the open-source wimlib package,
-	and expects those utilities to be accessible through $PATH. The wimlib package
-	can be installed from either Homebrew or MacPorts.
-	
-	If the -a option is used to optionally use aria2c(1) instead of curl(1) for the
-	download of the ESD from Microsoft, the open-source aria2 package must be
-	installed from either Homebrew or MacPorts.
-	
-EXIT STATUS
-
-	0			Successful creation of the ISO file
-	Non-zero 	Unsuccessful creation of the ISO file
-	
-NOTES
-	The script must be made executable after extraction from the zip file.
-	
-	This script only runs on macOS.
-
-	Have at least 15GB of free disk space to run this script. The script will check 
-	for what it considers to be sufficient space and will refuse to run if it isn't
-	available. 
-	
-	Without the -a option, an interruption in the download of the ESD due to network
-	issues will require the entire download to be processed from the beginning.
-	
-	With the -a option, retry and restart features are enabled that allow an interrupted
-	download to be resumed from the point of interruption.  The script will automatically
-	retry an interrupted download up to 20 times (each retry resuming from the point of 
-	interruption). After 20 retries, the script will exit, and will display a command 
-	(using the -r option) that can be copy/pasted to resume the ESD download.
-		
-	This script only builds ISO media for Windows 11 ARM. It does not build media 
-	for any other CPU architecture or version of Windows.
-
-	More extensive guidance on the use of this script to create Windows 11 ISO media 
-	suitable for use with VMware Fusion 13 on Apple Silicon can be found in the 
-	Unofficial Fusion 13 for Apple Silicon Companion Guide which is found at
-	https://communities.vmware.com/t5/VMware-Fusion-Documents/The-Unofficial-Fusion-13-for-Apple-Silicon-Companion-Guide/ta-p/2939907
-
-EXAMPLES
-
-	./w11arm_esd2iso -l
-	
-		Display a list of supported Windows 11 ARM languages and their associated
-		language tags. 
-
-	./w11arm_esd2iso en-us
-	
-		Download and build the en-us (US English) language ISO of Windows 11 ARM. 
-		No download restart is supported. 
-
-	./w11arm_esd2iso -a en-us
-	
-		Download and build the en-gb (UK English) language ISO of Windows 11 ARM.
-		Restart of interrupted downloads using the -r option are supported.
-		
-	./w11arm_esd2iso -r ./esd2iso_work.abcdef
-	
-		Restart a interrupted download from the point of interruption using the
-		work directory ./esd2iso_work.abcdef left behind from a previous run of the script 
-		that used the -a option.
-		
-AUTHOR
-	Paul Rockwell (@Technogeezer on VMware Fusion Discussions forum)
-	
-CREDITS
-	Information for obtaining Microsoft ESD distributions and
-	Microsoft Product catalog from b0gdanw "ESD to ISO on macOS.txt" 
-	https://gist.github.com/b0gdanw/e36ea84828dbd19e03eff6158f1fc77c
-
-LICENSE
-	This script is free software and is provided AS-IS. NO WARRANTIES
-	OR GUARANTEES, EXPRESS OR IMPLIED, ARE PROVIDED. USE AT YOUR OWN RISK.
-	
-SUPPORT
-	No production level support is available for this script. The author only
-	provides best effort response to any issues with no service level targets.
-	
-	Any questions about this script should be posted to the VMware Fusion Discussions 
-	forum: https://communities.vmware.com/t5/VMware-Fusion/ct-p/3005-home
-
-	If you find an error please run the script with the -v option, then attach the entire
-	output of the script in a zip file to your post.
-	
-TODO
-	It shouldn't be too hard to modify this script to run on Linux. There are no
-	intentions to make this script run on Windows.
-
-
-	
+It is preferred that you do NOT submit bug reports to the VMware Fusion Documents forum post 
+https://communities.vmware.com/t5/VMware-Fusion-Documents/w11arm-esd2iso-a-script-to-create-Windows-11-ARM-ISOs-from/ta-p/2957381
+where you found this script. Replies in the VMware Fusion Documents forum do not have 
+the ability to attach zip files containing logging that can help resolve the issue.
 
