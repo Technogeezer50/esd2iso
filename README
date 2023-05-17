@@ -1,27 +1,50 @@
-README for w11arm_esd2iso 2.2 (22-Mar-2023)
+README for w11arm_esd2iso 3.0 (22-May-2023)
 
-This script is designed to create ISO installation media for Windows 11 ARM from 
+This utility is designed to create ISO installation media for Windows 11 ARM from 
 ESD files in Microsoft's software distribution infrastructure.
-This ISO can be used to install Windows 11 virtual machines on VMware Fusion 13 on 
-Apple Silicon. 
+The resulting ISO can be used to install Windows 11 ARM virtual machines on VMware 
+Fusion 13 on Apple Silicon. 
 
-This script will not be necessary when either Microsoft provides a Windows 11 ARM ISO 
+This utility no longer requires that you install components from Homebrew or MacPorts. 
+All required components are now included with the utility.
+
+This utility will not be necessary when either Microsoft provides a Windows 11 ARM ISO 
 for end-user download or VMware provides a way to create the ISO in their Fusion product 
 like Parallels does.
 
 Contents of the downloaded zip file:
 
-	- README - (this document, the primary documentation for the script)
-	- CHANGELOG (contains a summary of changes) 
-	- w11arm_esd2iso (the script)
+	- README - (this document)
+	- w11arm_esd2iso (the utilituy)
 	- w11arm_esd2iso_manual.pdf (PDF version of documentation in man(1) format.
+	- doc (other documentation and GPL licensing notices)
+	- bin (required open source utilities)
+	- lib (libraries for required open source utiltiies)
 	
-You are encouraged to read the w11arm_esd2iso_manual.pdf document which now contains
+You are encouraged to read the w11arm_esd2iso_manual.pdf document which contains
 the primary documentation for w11arm_esd2iso.
+
+LEGALESE
+
+w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 
 QUESTIONS?
 
-Any questions about this script should be posted to the VMware Fusion forum: 
+Any questions about this utility should be posted to the VMware Fusion forum: 
 https://communities.vmware.com/t5/VMware-Fusion/ct-p/3005-home
 
 FOUND A BUG?
@@ -34,7 +57,7 @@ When you report an error, please re-create it by running w11arm_esd2iso with the
 containing the output. Attach that zip file to your post in the VMware Fusion forum.
 
 It is preferred that you do NOT submit bug reports to the VMware Fusion Documents forum post 
-https://communities.vmware.com/t5/VMware-Fusion-Documents/w11arm-esd2iso-a-script-to-create-Windows-11-ARM-ISOs-from/ta-p/2957381
-where you found this script. Replies in the VMware Fusion Documents forum do not have 
+https://communities.vmware.com/t5/VMware-Fusion-Documents/w11arm-esd2iso-a-utility-to-create-Windows-11-ARM-ISOs-from/ta-p/2957381
+where you found this utility. Replies in the VMware Fusion Documents forum do not have 
 the ability to attach zip files containing logging that can help resolve the issue.
 

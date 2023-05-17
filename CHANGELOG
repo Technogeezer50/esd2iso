@@ -28,11 +28,22 @@ Version 2.1 (22-Mar-2023)
 	
 	Examples now appear in the README file
 
-Version 2.2 (xxx-xxx-2023)	
+Version 3.0 (23-May-2023)	
 
-	Removal of manpage documentation from README
+	Now released under GPLv2 license.
+
+	Removal of manpage documentation from README file.
 	
-	Creation of manpage documentation in pdf format
+	Creation of manpage documentation in pdf format.
 	
-	Rename of script from w11arm_esd2iso.sh to w11arm_esd2iso
+	Rename of utility from w11arm_esd2iso.sh to w11arm_esd2iso.
+
+	Installation of aria2 and wimlib from Homebrew or MacPorts is no longer required. The
+	necessary utilities that w11arm_esd2iso needs are now bundled with the distribution.
+
+	Tests required for existence of Homebrew or MacPorts have been removed since they
+	are no longer necessary. 
+
+	Removal of -a option - aria2c is used for all downloads and restarts are
+	automatically enabled.
 

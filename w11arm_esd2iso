@@ -1,34 +1,49 @@
 #!/bin/sh
 #
+# w11arm_esd2iso - download and convert Microsoft ESD files for Windows 11 ARM to ISO
+#
+# Copyright (C) 2023 Paul Rockwell
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA#
 #
 # Credit: Location and methods of obtaining Microsoft ESD distributions and
 # Microsoft Product catalog from b0gdanw "ESD to ISO on macOS.txt" https://gist.github.com/b0gdanw/e36ea84828dbd19e03eff6158f1fc77c
 #
-# This script is offered as-is, with NO GUARANTEES OR WARRANTIES
-#
 
 
 verbosityLevel=0
-aOption=0
 bOption=0
 hOption=0
 lOption=0
 rOption=0
 langCodes=""
+cmdPath="./bin"
+export DYLD_FALLBACK_LIBRARY_PATH="./lib"
 
-version="w11arm_esd2iso 2.1 (22-Mar-2023)\n"
-requires="wiminfo wimapply wimexport"
+version="w11arm_esd2iso 3.0 (22-May-2023)\n"
+requires="wiminfo wimapply wimexport aria2c"
 
 usage() {
   echo "Usage:\n"
-  echo "$0 [-abhvV] esd-language"
+  echo "$0 [-bhvV] esd-language"
   echo "$0 [-vVh] -r work-dir"
   echo "$0 [-vVh] -l\n\nArguments:"
   echo "\tesd-language\\tValid Windows 11 language tag"
   echo "\twork-dir\tWork directory for restarting failed download"
   echo "\nOptions:"
-  echo "\t-a\tUse aria2c for ESD download instead of curl"
-  echo "\t-b\t  Download business (Pro/Enterprise) ESD instead of consumer (Home/Pro)"
+  echo "\t-b\tDownload business (Pro/Enterprise) ESD instead of consumer (Home/Pro)"
   echo "\t-h\tPrint usage and exit"
   echo "\t-v\tEnable verbose output"
   echo "\t-V\tPrint script version and exit"
@@ -75,10 +90,10 @@ downloadCatalog() {
 		exit 1
 	fi
 	
-	#
+	#---------------
 	# Download and process the Windows Product Catalog so we know what languages are available
 	# and the URLs for the downloads
-	#
+	#---------------
 	
 	if [ $editionType -eq 0 ]; then
 		editionName="Consumer (Home/Pro)"
@@ -122,14 +137,14 @@ downloadCatalog() {
 
 setupEsdDownload(){
 
-###################
+#---------------
 # Find the desired language variant file 
 #
 # Now that we know we have an image available in the desired language,
 # build the file names for the download URL (from the Microsoft catalog info),
 # the file name for the ESD that resides in the working directory
 # and the name of the ISO we're going to generate
-###################
+#---------------
 	
 	xpath -q -n -e '//File[LanguageCode="'$esdLang'"]' $workingDir/w11arm_products.xml >$workingDir/esd_edition.xml
 	esdURL=$(xpath -n -q -e '//FilePath' $workingDir/esd_edition.xml | sed -E -e s/'(<FilePath>)|(<\/FilePath>)'//g)
@@ -157,41 +172,34 @@ downloadEsd() {
 	local retVal
 	local retryCount
 	local retryLimit
-	local showProgress
+	local displayInterval
 	
 	retryLimit=20
 	retryCount=0
-	
-	verboseOn && echo "NOTE: Using $downloadApp for ESD download"
+
 	#
-	# Get the ESD from Microsoft
+	# Download the ESD from Microsoft
 	#
 	
-	if [ $downloadApp = "curl" ]; then
-	   showProgress="--progress-bar"
-	   verboseOn && showProgress=""
-		curl --keepalive-time 300 $showProgress $esdURL -o $esdFile;
+	displayInterval=0
+	verboseOn && displayInterval=120
+	retVal=1
+	while [ $retVal -ne 0 -a $retryCount -lt $retryLimit ]
+	do
+		retryCount="$((retryCount + 1))"
+		echo "ESD Download attempt $retryCount"
+		aria2c --summary-interval=$displayInterval -d $workingDir --file-allocation=none $esdURL
 		retVal=$?
-	else
-		showProgress="--summary-interval=0"
-	    verboseOn && showProgress="--summary-interval=120"
-	    retVal=1
-	    while [ $retVal -ne 0 -a $retryCount -lt $retryLimit ]
-		do
-			retryCount="$((retryCount + 1))"
-			echo "ESD Download attempt $retryCount"
-			aria2c $showProgress -d $workingDir --file-allocation=none $esdURL
-			retVal=$?
-			if [ $retVal -ne 0 ]; then
-				echo "Download interrupted, \c"
-				if [ $retryCount -eq $retryLimit ]; then
-					echo "retry limit reached"
-				else
-					echo "retrying"
-				fi
+		if [ $retVal -ne 0 ]; then
+			echo "Download interrupted, \c"
+			if [ $retryCount -eq $retryLimit ]; then
+				echo "retry limit reached"
+			else
+				echo "retrying"
 			fi
-		done
-	fi
+		fi
+	done
+
 	if [ $retVal -eq 0 ]; then
 		verboseOn && wiminfo $esdFile
 	fi
@@ -222,10 +230,11 @@ extractEsd(){
 	
 	esdImageCount=$(wiminfo $eFile | awk '/Image Count:/ {print $3}')
 	verboseOn && echo "image count in ESD: $esdImageCount"
+	[ $esdImageCount -eq 6 ] && images="$images 6"
 
-	#
+	#---------------
 	# Extract image 1 in the ESD to create the boot environment
-	#
+	#---------------
 
 	echo "\nApplying boot files to the image"
 	wimapply $eFile 1 $eDir $beQuiet 2>/dev/null
@@ -237,13 +246,13 @@ extractEsd(){
 
 	echo "Files applied"
 
-	################
+	#---------------
 	# Create the boot.wim file that contains WinPE and Windows Setup
 	# Images 2 and 3 in the ESD contain these components
 	#
 	# Important: image 3 in the ESD must be marked as bootable when
 	# transferred to boot.wim or else the installer will fail
-	################
+	#---------------
 
 	echo "\nAdding WinPE and Windows Setup to the image"
 	wimexport $eFile 2 $bootWimFile --compress=LZX --chunk-size 32K $beQuiet
@@ -264,14 +273,11 @@ extractEsd(){
 	verboseOn && wiminfo  $bootWimFile
 
 	echo "\nAdding Windows editions to image"
-
-	################
+	
+	#---------------
 	# Create the install.wim file that contains the files that Setup will install
 	# Images 4, 5, (and 6 if it exists) in the ESD contain these components
-	################
-	
-
-	[ $esdImageCount -eq 6 ] && images="$images 6"
+	#---------------
 	
 	for imageIndex in $images; do
 		imageEdition="$(wiminfo $eFile $imageIndex | grep '^Description:' | sed 's/Description:[ \t]*//')"
@@ -328,11 +334,8 @@ buildIso(){
 # 
 #-------------------
 
-while getopts ":abhlr:vV" opt; do
+while getopts ":bhlr:vV" opt; do
   case $opt in
-    a)
-    	aOption=1
-    	;;
     b)
     	bOption=1
     	;;
@@ -406,14 +409,10 @@ if [ $rOption -eq 1 ]; then
 		usage
 		exit 1
 	fi
-	if [ $aOption -eq 1 ]; then
-		echo "NOTE: -a option is implied with -r, no need to specify it"
-	fi;
-	aOption=1
 fi
 if [ $lOption -eq 1 ]; then
-	if [ $rOption -eq 1  -o  $aOption -eq 1  ]; then
-		echo "ERROR: the -a and -r options can not be used with the -l option"
+	if [ $rOption -eq 1 ]; then
+		echo "ERROR: the -r option can not be used with the -l option"
 		usage
 		exit 1
 	fi
@@ -431,41 +430,16 @@ fi
 # Warn the user if any of them are not here and abort
 #-------------------
 
-#--------------------
-# Check to see if Homebrew or MacPorts is installed
-#--------------------
 
-if [ $(uname -m) = "arm64" ]; then
-	cmdPath="/opt/homebrew/bin"
-else
-	cmdPath="/usr/local/bin"
-fi
-if [ ! -x "${cmdPath}/brew" ]; then
-	if [ -x /opt/local/bin/port ]; then
-		cmdPath="/opt/local/bin"
-	else
-		cmdPath=""
-	fi
-fi
-verboseOn && echo "Utility path is $utilPath"
-
-if [ "x$cmdPath" = "x" ]; then
-	echo "ERROR: Neither Homebrew or MacPorts appear to be installed"
-	echo "Please install one of them and then install required packages"
-	exit 1
-fi
+verboseOn && echo "Utility path is $cmdPath"
 
 # 
-# If for some reason the user has installed Homebrew or MacPorts, but has not
-# put the base directory into $PATH, lets do it for them
+# Set the PATH variable so we can find the required open source utilities without the user
+# having to do it
 #
 
-echo $PATH | grep -E "$cmdPath"'((:)|($))'
-if [ $? -ne 0 ]; then
-	verboseOn && echo "NOTE: $cmdPath exists, but isn't on shell's PATH. Adding it."
-	PATH="${cmdPath}:${PATH}"
-	verboseOn && echo "Path is now set to $PATH"	
-fi
+PATH="${cmdPath}:${PATH}"
+verboseOn && echo "Path is now set to $PATH"
 
 #--------------------
 # Now see if the utilities are there
@@ -474,49 +448,24 @@ fi
 notFound=0
 for i in $requires; do
     if [ ! -x "${cmdPath}/$i" ]; then
-      echo "ERROR: Required program $i not found"
+      echo "ERROR: Bundled utility program $i not found"
       notFound=1
     fi
 done
 if [ $notFound -eq 1 ]; then
-      echo "Please install required packages from Homebrew or MacPorts"
+      echo "ERROR: Improper installation - all components from the zip file must be in this directory\nPlease extract the entire contents of the zip file to this directory"
       exit 1
 fi 
 
-#-------------------
-#
-# If the -a option was specified, see if aria2c exists
-# If we are doing a restart and aria2c doesn't exist, error out since a restartable
-# download can only occur with aria2c
-# If we aren't doing a restart and aria2c doesn't exist, then default back to curl
-#
-#-------------------
-
-downloadApp="curl"
-if [ $aOption -eq 1 ]; then
-	if [ -x "${cmdPath}/aria2c" ]; then
-		downloadApp="aria2c"
-	else
-		if [ $rOption -eq 1 ]; then
-			echo "ERROR: Download restart requested, but aria2c can not be found"
-			echo "Restart can not be performed"
-			exit 2
-		else
-		    echo "WARNING: aria2c not found, -a option ignored"
-		    aOption=0
-		fi
-   	fi
-fi
-
 if [ $rOption -eq 0 -o $lOption -eq 1 ]; then
-	################
+	#---------------
 	#
 	# If normal processing or the -l option has been specified:
 	#
 	# 	Make a temp in the current working directory where we're going to do all of our work
 	# 	Download the catalog after the temp directory has been created
 	#
-	################
+	#---------------
 
 	workingDir="$(mktemp -q -d ./esd2iso_temp.XXXXXX)"
 	if [ $? -ne 0 ]; then
@@ -540,11 +489,11 @@ fi
 
 if [ $rOption -eq 0 ]; then
 
-	################
+	#---------------
 	#
 	# Normal processing, no restart
 	#
-	################
+	#---------------
 		
 	freeSpace=$(df -g . | awk '/dev.*/ {print $4}')
 	verboseOn && echo "Free space is $freeSpace GB"
@@ -560,12 +509,12 @@ if [ $rOption -eq 0 ]; then
 		fi
 	fi
     
-	################
+	#---------------
 	#
 	# extDir is the "extract directory" where we're going to extract the ESD 
 	# and evenutally build the ISO from. It's a subdirectory of the working/temp directory
 	#
-	################
+	##---------------
 
 	extDir=$workingDir/ESD_ISO
 	mkdir $extDir
@@ -576,11 +525,11 @@ if [ $rOption -eq 0 ]; then
 		echo "INFO: Language tag $1 has been converted to lower case"
 	fi
 
-	################
+	#---------------
 	#
 	# Verify that the language is supported by Windows
 	#
-	################
+	#---------------
 	
 	echo "\nVerifying language $esdLang is available\c"
 
@@ -604,43 +553,39 @@ if [ $rOption -eq 0 ]; then
 	setupEsdDownload
 	echo "\nStep 1 complete"
 
-	echo "\nStep 2: Downloading ESD from Microsoft with $downloadApp"
+	echo "\nStep 2: Downloading ESD from Microsoft"
 	downloadEsd
 	retVal=$?
 	if [ $retVal -ne 0 ]; then
 		echo  "ERROR: ESD download interrupted with error $retVal"
-		if [ $aOption -eq 1 ]; then 
-			################
-			#
-			# Write out values of variables that we'll need for restart
-			# in a flag file restartOK that we set in the work directory
-			#
-			################
-			
-			touch $workingDir/restartOK
-			echo "isoFile $isoFile" >> $workingDir/restartOK
-			echo "esdFile $esdFile" >> $workingDir/restartOK
-			echo "esdURL $esdURL" >> $workingDir/restartOK
-			echo "ESD download can be restarted with the following command:"
-			echo "$0 -r $workingDir"
-		else
-			rm -rf $workingDir
-		fi
+		#---------------
+		#
+		# Write out values of variables that we'll need for restart
+		# in a flag file restartOK that we set in the work directory
+		#
+		#---------------
+		
+		touch $workingDir/restartOK
+		echo "isoFile $isoFile" >> $workingDir/restartOK
+		echo "esdFile $esdFile" >> $workingDir/restartOK
+		echo "esdURL $esdURL" >> $workingDir/restartOK
+		echo "ESD download can be restarted with the following command:"
+		echo "$0 -r $workingDir"
 		exit 1
 	fi
 
 else
-	################
+	#---------------
 	#
 	# Restart option selected
 	#
-	################
+	#---------------
 	
-	################
+	#---------------
 	#
 	# See if the work directory exists and if it supports restart
 	#
-	################
+	#---------------
 	
 	if [ ! -d $workingDir ]; then
 		echo "ERROR:Work directory $workingDir does not exist, exiting"
@@ -652,11 +597,11 @@ else
 	fi;
 	echo "\nRestarting interrupted download using work directory $workingDir\n"
 
-	################
+	#---------------
 	#
 	# Read variables needed for restart from the restartOK file
 	#
-	################
+	#---------------
 	
 	extDir=$workingDir/ESD_ISO
 	isoFile=$(cat $workingDir/restartOK | awk '/isoFile/ { print $2 }')
@@ -682,12 +627,12 @@ else
 	fi
 fi
 
-################
+#---------------
 #
 # Regardless of whether restart was asked for or not, at this point
 # we have an ESD downloaded. 
 #
-################
+#---------------
 	
 echo "\nStep 2 complete - ESD downloaded"	
 # echo "no need to build anything further -we know that works"
