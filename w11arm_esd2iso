@@ -300,7 +300,7 @@ buildIso(){
 	iFile=$2
 	
 	if [ -e $iFile ]; then
-	  echo "\tWARNING: File $iFile exists, removing it"
+	  echo "\tINFO: File $iFile exists, removing it"
 	  rm -rf $iFile
 	fi
 
@@ -356,13 +356,13 @@ while getopts ":abhlr:vV" opt; do
     	exit 1
     	;;
     :)
-    	echo "Option -$OPTARG requires an argument"
+    	echo "ERROR: Option -$OPTARG requires an argument"
     	usage
     	exit 1
     	;;
     
     \?)
-    	echo "Invalid option: -$OPTARG\n"
+    	echo "ERROR: Invalid option: -$OPTARG\n"
     	usage
     	exit 1
     	;;
@@ -431,14 +431,24 @@ fi
 # Warn the user if any of them are not here and abort
 #-------------------
 
-cmdPath=""
-for utilPath in "/opt/homebrew/bin" "/opt/local/bin" "/usr/local/bin"; do
-	if [ -d "$utilPath" ]; then
-		cmdPath="${utilPath}"
-		verboseOn && echo "Utility path is $utilPath"
-		break
-	fi;
-done
+#--------------------
+# Check to see if Homebrew or MacPorts is installed
+#--------------------
+
+if [ $(uname -m) = "arm64" ]; then
+	cmdPath="/opt/homebrew/bin"
+else
+	cmdPath="/usr/local/bin"
+fi
+if [ ! -x "${cmdPath}/brew" ]; then
+	if [ -x /opt/local/bin/port ]; then
+		cmdPath="/opt/local/bin"
+	else
+		cmdPath=""
+	fi
+fi
+verboseOn && echo "Utility path is $utilPath"
+
 if [ "x$cmdPath" = "x" ]; then
 	echo "ERROR: Neither Homebrew or MacPorts appear to be installed"
 	echo "Please install one of them and then install required packages"
@@ -457,10 +467,13 @@ if [ $? -ne 0 ]; then
 	verboseOn && echo "Path is now set to $PATH"	
 fi
 
+#--------------------
+# Now see if the utilities are there
+#--------------------
+
 notFound=0
 for i in $requires; do
-    which -s $i
-    if [ $? -ne 0 ]; then
+    if [ ! -x "${cmdPath}/$i" ]; then
       echo "ERROR: Required program $i not found"
       notFound=1
     fi
@@ -481,8 +494,7 @@ fi
 
 downloadApp="curl"
 if [ $aOption -eq 1 ]; then
-	which -s aria2c
-	if [ $? -eq 0 ]; then
+	if [ -x "${cmdPath}/aria2c" ]; then
 		downloadApp="aria2c"
 	else
 		if [ $rOption -eq 1 ]; then
@@ -561,7 +573,7 @@ if [ $rOption -eq 0 ]; then
 	esdLang=$(echo $1 | tr "[:upper:]" "[:lower:]")
 
 	if [ $esdLang != $1 ]; then
-		echo "NOTE: Language tag $1 has been converted to lower case"
+		echo "INFO: Language tag $1 has been converted to lower case"
 	fi
 
 	################
