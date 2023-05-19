@@ -1,30 +1,53 @@
-README for w11arm_esd2iso 3.0 (22-May-2023)
+README for w11arm_esd2iso 3.0 (19-May-2023)
+
+SUMMARY
 
 This utility is designed to create ISO installation media for Windows 11 ARM from 
 ESD files in Microsoft's software distribution infrastructure.
 The resulting ISO can be used to install Windows 11 ARM virtual machines on VMware 
 Fusion 13 on Apple Silicon. 
 
-This utility no longer requires that you install components from Homebrew or MacPorts. 
-All required components are now included with the utility.
-
 This utility will not be necessary when either Microsoft provides a Windows 11 ARM ISO 
 for end-user download or VMware provides a way to create the ISO in their Fusion product 
 like Parallels does.
+
+CONTENTS OF ZIP FILE
 
 Contents of the downloaded zip file:
 
 	- README - (this document)
 	- w11arm_esd2iso (the utilituy)
-	- w11arm_esd2iso_manual.pdf (PDF version of documentation in man(1) format.
+	- w11arm_esd2iso_manpage.pdf (PDF version of documentation in man(1) format.
 	- doc (other documentation and GPL licensing notices)
 	- bin (required open source utilities)
 	- lib (libraries for required open source utiltiies)
-	
-You are encouraged to read the w11arm_esd2iso_manual.pdf document which contains
-the primary documentation for w11arm_esd2iso.
 
-LEGALESE
+CHANGES IN V3.0
+
+w11arm_esd2iso is now released under the GNU General Public License. See the LEGAL
+section of this README and the documents contained in the doc folder provided by 
+the distribution.
+
+Primary documentation for w11arm_esd2iso has been moved from this README file to 
+the file w11arm_esd2iso_manpage.pdf, where it has been converted into a proper UNIX-style
+man page. 
+
+w11arm_esd2iso no longer requires the installation of open-source utilities
+from Homebrew or MacPorts. All required components are now included with the utility.
+Licensing notifications for open-source third-party components can be found in the
+doc folder.
+
+All downloads are now performed using the bundled aria2c utility. The behavior is the same
+as if the -a option was specifified in prior versions.
+
+The -a option has been deprecated and is no longer documented. If specified, a warning
+will be issued and the option will be ignored. This was done to provide backward 
+compatibility of the command syntax with earlier versions. 
+
+Since aria2c is being used for all downloads, all interrupted downloads can be resumed
+using the -r option. 
+
+LEGAL
 
 w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell
 

@@ -3,6 +3,8 @@
 version=$1
 FILES="README w11arm_esd2iso w11arm_esd2iso_manpage.pdf doc bin lib"
 DOCS="CHANGELOG COPYING COPYING.GPLv2 COPYING.GPLv2 COPYING.LGPLv3"
+thisDir="$(pwd)"
+buildDir="./zipfile"
 
 rebuild_bindir() {
 	
@@ -17,7 +19,7 @@ rebuild_bindir() {
 	rm -rf $1
 	mkdir $1
 
-	( cd "${BINDIR}"
+	( cd "$BINDIR"
 
 	  cp /opt/local/bin/aria2c ./
 	  cp /opt/local/bin/wimlib-imagex ./
@@ -29,7 +31,7 @@ rebuild_bindir() {
 
 	# ls -alR "${BINDIR}"
 
-        return 0
+    return 0
 }
 rebuild_libdir() {
 
@@ -43,8 +45,8 @@ rebuild_libdir() {
 	echo "Rebuilding lib directory $LIBDIR"
 	rm -rf $1
 
-	mkdir $LIBDIR
-	( cd $LIBDIR
+	mkdir "$LIBDIR"
+	( cd "$LIBDIR"
 
 	  cp -R /opt/local/lib/libgmp*.dylib ./
 	  cp -R /opt/local/lib/libgmpxx*.dylib ./
@@ -74,32 +76,36 @@ if [ "x$version" = "x" ]; then
    echo "Error: must specify a version"
    exit 1
 fi
+if [ -e "$buildDir" ]; then
+	echo "ERROR: $buildDir exists, please remove it and re-run the build"
+	exit 1
+fi
 
-rm -rf zipfile
-mkdir zipfile
+mkdir "$buildDir"
 
 echo "Installing utility and README files"
 
-cp w11arm_esd2iso zipfile
-cp README zipfile
+cp w11arm_esd2iso "$buildDir"
+cp README "$buildDir"
 
-rebuild_bindir zipfile/bin
-rebuild_libdir zipfile/lib
+rebuild_bindir "$buildDir"/bin
+rebuild_libdir "$buildDir"/lib
 
-echo "Rebuilding doc directory zipfile/doc"
-mkdir zipfile/doc
-cp $DOCS zipfile/doc
+echo "Rebuilding doc directory $buildDir/doc"
+mkdir "$buildDir"/doc
+cp $DOCS "$buildDir"/doc
 
 echo "Creating manpage doc"
-pandoc --from=markdown --to=man  w11arm_esd2iso.1.md --standalone | mandoc -man -T pdf >zipfile/w11arm_esd2iso_manpage.pdf
+pandoc --from=markdown --to=man  w11arm_esd2iso.1.md --standalone | mandoc -man -T pdf >"$buildDir"/w11arm_esd2iso_manpage.pdf
 
-ls -alR zipfile
+ls -alR "$buildDir"
 
 echo "Creating zip file w11arm_esd2iso-V${version}.zip"
 
-( cd zipfile; zip -ry ../w11arm_esd2iso-V${version}.zip  $FILES )
+( cd "$buildDir"; zip -ry "$thisDir"/w11arm_esd2iso-V${version}.zip  $FILES )
 
-rm -rf zipfile
+rm -rf "$buildDir"
+
 exit 0
 
 

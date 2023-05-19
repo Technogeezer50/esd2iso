@@ -71,7 +71,6 @@ starting with version 3.0. All required utilities are provided in the distributi
 : Unsuccessful creation of the ISO file
 	
 # NOTES
-The utility may need to be made executable (with chmod +x) after extraction from the zip file.
 
 This utility only runs on Apple Silicon Macs running macOS 13 (Ventura) or later.
 
@@ -87,15 +86,20 @@ errors are encountered. It will not be deleted if a transfer of the ESD can be
 restarted using the -r option, or if the final phase of the ESD creation
 fails.  
 
-The utility automatically enables retry and restart features that allow a
-download to be resumed in the event of a loss of network connectivity to the Microsoft
-repositories.  The utility will automatically
-retry an interrupted download up to 20 times. After 20 retries, the utility will exit, and will display a command 
-(containing the -r option) that can be copy/pasted to resume the ESD download. 
+The -a option has been deprecated and removed from the documentation as the aria2c utility
+is used for all downloads. The option remains for backward compatibility with the command
+syntax of prior versions of the utility. If it is used, a warning message will be printed
+that the option is deprecated and that it has no effect on the utility.
 
-The -r option can be used as mamy times as necessary as directed by the utility to complete the download. (although in
-all honesty, it shouldn't need to be used more than once unless you have a really, really
-bad network connection). Each restart attempt
+The utility automatically enables retry and restart features that handle the interruption 
+of downloads from the Microsoft repositories due to network connectivity issues.  The 
+utility will automatically retry an interrupted download up to 20 times. After 20 retries,
+the utility will exit, and will display a command (containing the -r option) that can be 
+copy/pasted to resume the ESD download. 
+
+The -r option can be used as mamy times as necessary as directed by the utility to 
+complete the download. (although in all honesty, it shouldn't need to be used more than 
+once unless you have a really, really bad network connection). Each restart attempt
 using the -r option will resume a download from the point of interruption of the
 last execution of the utility. 
 			
@@ -136,7 +140,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 	
 # SUPPORT
-No production level support is available for this script. The author only
+No production level support is available for this script. The author 
 provides best effort response to any issues with no service level targets.
 
 Any questions about this utility should be posted to the VMware Fusion Discussions 
@@ -146,8 +150,9 @@ If you find an error please run the utility with the -v option, then attach the 
 output of the utility in a zip file to your post.
 	
 # TODO
-Maybe someday this script will run on Linux. There are no
-intentions to make this script run on Windows.
+Maybe someday this script will run on Linux and on Intel Macs. No promises.
+
+There are no intentions to make this script run on Windows.
 
 
 	

@@ -334,8 +334,11 @@ buildIso(){
 # 
 #-------------------
 
-while getopts ":bhlr:vV" opt; do
+while getopts ":abhlr:vV" opt; do
   case $opt in
+    a)
+    	echo "NOTE: the -a option is deprecated, it will be ignored"
+    	;;
     b)
     	bOption=1
     	;;
