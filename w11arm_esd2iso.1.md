@@ -1,4 +1,4 @@
-% W11ARM_ESD2ISO(1) w11arm_esd2iso 3.0
+% W11ARM_ESD2ISO(1) w11arm_esd2iso 3.0.1
 % Paul Rockwell (@Technogeezer on VMware Fusion forum)
 % May 2023
 

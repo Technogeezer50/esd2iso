@@ -1,4 +1,4 @@
-README for w11arm_esd2iso 3.0 (19-May-2023)
+README for w11arm_esd2iso 3.0.1  (19-May-2023)
 
 SUMMARY
 
@@ -22,30 +22,17 @@ Contents of the downloaded zip file:
 	- bin (required open source utilities)
 	- lib (libraries for required open source utiltiies)
 
-CHANGES IN V3.0
+CHANGES IN V3.0.1
 
-w11arm_esd2iso is now released under the GNU General Public License. See the LEGAL
-section of this README and the documents contained in the doc folder provided by 
-the distribution.
+Version 3.0 would display macOS Gatekeeper errors such as "unidentified
+developer" and "unable to verify with Apple" which prevented the utility from running.
+These errors were displayed when the the utility tried to run any of the bundled open source
+components.
+The errors could be worked around, but would require multiple
+manual interventions by the user to allow w11arm_esd2iso to run.
+This has been fixed in 3.0.1, and no manual intevention by the user is required.
 
-Primary documentation for w11arm_esd2iso has been moved from this README file to 
-the file w11arm_esd2iso_manpage.pdf, where it has been converted into a proper UNIX-style
-man page. 
-
-w11arm_esd2iso no longer requires the installation of open-source utilities
-from Homebrew or MacPorts. All required components are now included with the utility.
-Licensing notifications for open-source third-party components can be found in the
-doc folder.
-
-All downloads are now performed using the bundled aria2c utility. The behavior is the same
-as if the -a option was specifified in prior versions.
-
-The -a option has been deprecated and is no longer documented. If specified, a warning
-will be issued and the option will be ignored. This was done to provide backward 
-compatibility of the command syntax with earlier versions. 
-
-Since aria2c is being used for all downloads, all interrupted downloads can be resumed
-using the -r option. 
+See the CHANGELOG document in the doc folder for changes made in prior versions.
 
 LEGAL
 

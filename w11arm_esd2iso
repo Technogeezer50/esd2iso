@@ -30,10 +30,12 @@ lOption=0
 rOption=0
 langCodes=""
 cmdPath="./bin"
-export DYLD_FALLBACK_LIBRARY_PATH="./lib"
+libPath="./lib"
 
-version="w11arm_esd2iso 3.0 (22-May-2023)\n"
+
+version="w11arm_esd2iso 3.0.1 (21-May-2023)\n"
 requires="wiminfo wimapply wimexport aria2c"
+requiredLibs="libcrypto libgmp libgmpxx libiconv libicudata libicui18n libicuio libicutest libicutu libicuuc libintl liblzma libuv libwim libxml2 libz"
 
 usage() {
   echo "Usage:\n"
@@ -436,13 +438,36 @@ fi
 
 verboseOn && echo "Utility path is $cmdPath"
 
+#--------------------
+# Bug fix 21-May-2023
 # 
-# Set the PATH variable so we can find the required open source utilities without the user
-# having to do it
+# Downloading the zip file using Safai (maybe others) will result in the
+# com.apple.quarantine flag being set on the extracted files. When the utility
+# tries to open the bundled utilities, macOS throws Gatekeeper error messages
+# such as "unidentified developer" or "can't verify with Apple"
+# 
+# This fix removes any com.apple.quarantine extended attributes from the
+# bundled components so the user doesn't have to deal
+# with the Gatekeeper issues.
+#--------------------
+
+
+
+if [ \( ! -d ${cmdPath} \) -o \( ! -d ${libPath} \) ]; then
+	echo "ERROR: Your current working directory $(pwd) is not the directory where $0 was unzipped";
+	echo "Please change your working directory to the directory where you unzipped this utility and rerun it from there"
+	exit 1
+fi
+
+# 
+# Set the environment variables necessary for the utility to find and run the bundled
+# open source utilities 
 #
 
 PATH="${cmdPath}:${PATH}"
-verboseOn && echo "Path is now set to $PATH"
+export DYLD_FALLBACK_LIBRARY_PATH="$libPATH"
+verboseOn && echo "PATH is now set to $PATH"
+verboseOn && echo "DYLD_FALLBACK_LIBRARY_PATH is now set to $DYLD_FALLBACK_LIBRARY_PATH"
 
 #--------------------
 # Now see if the utilities are there
@@ -451,14 +476,33 @@ verboseOn && echo "Path is now set to $PATH"
 notFound=0
 for i in $requires; do
     if [ ! -x "${cmdPath}/$i" ]; then
-      echo "ERROR: Bundled utility program $i not found"
+      verboseOn && echo "ERROR: Bundled utility program $i not found"
       notFound=1
-    fi
+    else 
+		if verboseOn; then   
+			xattr -d com.apple.quarantine ${cmdPath}/${i}
+		else
+			xattr -d com.apple.quarantine ${cmdPath}/${i} 2>/dev/null
+		fi    
+	fi
+done
+for i in $requiredLibs; do
+    if [ ! -e "${libPath}/${i}.dylib" ]; then
+      verboseOn && echo "ERROR: Bundled library file ${i}.dylib not found"
+      notFound=1
+    else
+		if verboseOn; then   
+			xattr -d com.apple.quarantine ${libPath}/${i}.dylib
+		else
+			xattr -d com.apple.quarantine ${libPath}/${i}.dylib 2>/dev/null
+		fi    
+	fi
 done
 if [ $notFound -eq 1 ]; then
-      echo "ERROR: Improper installation - all components from the zip file must be in this directory\nPlease extract the entire contents of the zip file to this directory"
+      echo "ERROR: Improper installation\nPlease extract the entire contents of the zip file to this directory"
       exit 1
 fi 
+
 
 if [ $rOption -eq 0 -o $lOption -eq 1 ]; then
 	#---------------
