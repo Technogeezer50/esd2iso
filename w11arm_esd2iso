@@ -465,7 +465,7 @@ fi
 #
 
 PATH="${cmdPath}:${PATH}"
-export DYLD_FALLBACK_LIBRARY_PATH="$libPATH"
+export DYLD_FALLBACK_LIBRARY_PATH="$libPath"
 verboseOn && echo "PATH is now set to $PATH"
 verboseOn && echo "DYLD_FALLBACK_LIBRARY_PATH is now set to $DYLD_FALLBACK_LIBRARY_PATH"
 
