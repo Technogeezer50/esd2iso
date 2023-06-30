@@ -1,5 +1,41 @@
 CHANGELOG
 
+Version 4.0 (28-June-2023)
+
+	Version 4.0 is now an interactive utility that makes it even easier to create the Windows
+	11 ARM ISO.  
+	
+	THe utility now asks the user for the type of ISO to create (either Home/Pro or Pro/Enterprise)
+	and asks the user to select the language of the ISO from a list of valid languages
+	that it prints. It is no longer required to specify this information on the command line
+	or to run another option of the utility to print out the valid Windows languages.
+
+	As part of this change, the command line syntax is not compatible with versions 3.0.1
+	and earlier. The following changes have been made to the command line syntax:
+ 
+ 	- The esd-language argument on the command line is no longer required and has been removed. 
+ 	  This is replaced by the interactive dialog within the utility.
+ 	  
+ 	- The -l option to list the available languages has been removed.
+ 	  This is now automatically done as part of the new interactive dialog.
+ 	  
+ 	- The -b option to specify the Pro/Enterprise ISO hs been removed.
+ 	  This is replaced by a question for the user to select the editions in the 
+ 	  new interactive dialog. 
+ 	  
+	The -r option remains and is still used to resume an interrupted download.
+	
+	Version 4.0 recognizes if the wimlib or aria2 open-source utilities from Homebrew or 
+	MacPorts are available via the users $PATH veriable, and will use them if they are found.
+	If they aren't found, the bundled versions will be used. 
+	
+	The amount of disk required by the ISO build process has been reduced. 
+	The downloaded ESD file is deleted immediately before step 4 (the creation of the 
+	ISO from the installation image) as it is no longer needed at that point. This saves
+	approximately 5 GB of disk space over versions 3.0.1 and earlier during the build 
+	process. 
+	 
+	
 Version 3.0.1 (21-May-2023)
 
 	Version 3.0 would display macOS Gatekeeper errors such as "unidentified

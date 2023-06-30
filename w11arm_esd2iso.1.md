@@ -1,23 +1,24 @@
-% W11ARM_ESD2ISO(1) w11arm_esd2iso 3.0.1
+% W11ARM_ESD2ISO(1) w11arm_esd2iso 4.0
 % Paul Rockwell (@Technogeezer on VMware Fusion forum)
-% May 2023
+% June 2023
 
 # NAME
 w11arm_esd2iso - utility to build Windows 11 ARM ISOs from Microsoft ESD files
 
 # SYNOPSIS
-**w11arm_esd2iso** [-bhvV] *language-tag*\
-**w11arm_esd2iso** [-vVh] -r *work-dir*\
-**w11arm_esd2iso** [-vVh] -l
+**w11arm_esd2iso** [-v]\
+**w11arm_esd2iso** [-v] -r *work-dir*\
+**w11arm_esd2iso** [-Vh]
 
 # DESCRIPTION
 In the first form, a Windows 11 ARM 22H2 ESD (Electronic 
-Software Distribution) file for for the language *language-tag* is downloaded from Microsoft,
+Software Distribution) file is downloaded from Microsoft,
 and converted to ISO. This ISO can be used to install Windows 11 ARM on physical
 or virtual machines.
 	
-By default, a "Consumer" (Home/Pro) ISO will be built. Use the -b option to build
-a "Business" (Pro/Enterprise) ISO.
+The utility will prompt for the type of ISO to produce 
+(either Home/Pro or Pro/Enterprise) and the language for the created ISO. A list of
+available languages will be provided to assist in making the ISO language selection. 
 
 The generated ISO file is placed in the current working directory. The utility
 will display the name of the generated ISO file.
@@ -27,20 +28,13 @@ from Microsoft is resumed from the point of interruption and the ISO build proce
 will continue. The *work-dir* argument is required, 
 and is expected to be a work directory created from a prior failed run of the utility.
 
-In the third form, the utility prints a list of recognized Windows 11 ARM language tags.
-These tags can be used for the *language-tag* specification in the first form of the
-script. 
+In the third form, the utility will either print out it's version or a synopsis of 
+command line options, and immediately exit without performing any ISO build.
 	
 # OPTIONS
 
-**-b**		
-: Create an ISO for "Business" (Pro/Enterpise) editions rather than "Consumer" (Home/Pro) editions
-
 **-h**		
-: Print usage and exit
-
-**-l**
-: Print a list of valid language-tags and their corresponding languages and exit.
+: Print a synopsis of usage and exit
 
 **-r** *work-dir*
 : Resume an interrupted ESD download using the information from the work directory
@@ -60,8 +54,11 @@ working directory.
 
 
 # DEPENDENCIES
-w11arm_esd2iso no longer depends on the installation of open-source packages from either Homebrew or MacPorts
-starting with version 3.0. All required utilities are provided in the distribution zip file.
+w11arm_esd2iso requires an Apple Silicon (M1/M2) Macs running macOS 13 (Ventura) or later.
+
+Starting with version 3.0, w11arm_esd2iso no longer requires the installation of 
+open-source utilities from Homebrew or MacPorts. 
+All required utilities are provided in the distribution zip file.
 
 # EXIT VALUES
 **0**
@@ -72,56 +69,71 @@ starting with version 3.0. All required utilities are provided in the distributi
 	
 # NOTES
 
-This utility only runs on Apple Silicon Macs running macOS 13 (Ventura) or later.
 
-This utility only builds ISO media for Windows 11 ARM. It does not build media 
-for any other CPU architecture or version of Windows.
+There are no intentions to make this script run on Windows or Intel Macs.
 
-Have at least 15GB of free disk space to run this script. The utility will check 
-for what it considers to be sufficient space and will refuse to run if it isn't
+w11arm_esd2iso only builds ISO media for Windows 11 ARM 22H2. It does not build media 
+for any other versions of Windows or Windows Server.
+
+The current working directory must be changed to the directory where the distribution zip
+file of w11arm_esd2iso was extracted. The utility must be executed from that directory 
+otherwise the required bundled components will not be found. 
+
+Have at least 12 GB of free disk space to run w11arm_esd2iso. Checks are performed for
+sufficient disk space and the utility will refuse to run if space isn't available.
 available. 
+
+The w11arm_esd2iso utility contains bundled versions of the open-source wimlib-imagex(1) and 
+aria2c(1) utilities. These will be used if the utilities are not found to be installed
+with Homebrew/MacPorts. This is done for ease of use - the user 
+does not have to go through the complexity of installing Xcode command line tools, 
+Homebrew/MacPorts, and the packages containing these utilities. Im the unlikely event that 
+existing user-installed versions of aria2c and wimlib-imagex present a problem, 
+an uninstall of Homebrew/MacPorts is not necessary. The default behavior of using the 
+bundled utilites can be restored by removing the Homebrew/MacPorts binary directory from 
+the $PATH variable of the shell being used to
+run w11arm_esd2iso. 
 
 The work directory will be deleted upon successful ISO creation and when most 
 errors are encountered. It will not be deleted if a transfer of the ESD can be
 restarted using the -r option, or if the final phase of the ESD creation
 fails.  
 
-The -a option has been deprecated and removed from the documentation as the aria2c utility
-is used for all downloads. The option remains for backward compatibility with the command
-syntax of prior versions of the utility. If it is used, a warning message will be printed
-that the option is deprecated and that it has no effect on the utility.
+The command line syntax has changed starting with V4.0 and is not 100% compatible with 
+V3.0.1 and earlier. The functions provided by command line options and arguments are now
+provided by interactively prompting the user during the build process. 
 
-The utility automatically enables retry and restart features that handle the interruption 
-of downloads from the Microsoft repositories due to network connectivity issues.  The 
+The -a option has been removed as aria2c(1) is now used for all downloads. 
+
+w11arm_esd2iso automatically enables retry and restart features that handle the interruption 
+of ESD downloads from Microsoft due to network connectivity issues.  The 
 utility will automatically retry an interrupted download up to 20 times. After 20 retries,
 the utility will exit, and will display a command (containing the -r option) that can be 
 copy/pasted to resume the ESD download. 
 
-The -r option can be used as mamy times as necessary as directed by the utility to 
-complete the download. (although in all honesty, it shouldn't need to be used more than 
-once unless you have a really, really bad network connection). Each restart attempt
+The -r option can be used as many times as necessary as directed by the utility to 
+complete the download. In all honesty, it shouldn't need to be used more than 
+once unless you have a really, really bad network connection. Each restart attempt
 using the -r option will resume a download from the point of interruption of the
 last execution of the utility. 
 			
-More extensive guidance on the use of this utility to create Windows 11 ARM virtual
+More extensive guidance on the use of w11arm_esd2iso to create Windows 11 ARM virtual
 machines with VMware Fusion 13 on Apple Silicon can be found in the 
 Unofficial Fusion 13 for Apple Silicon Companion Guide which can be found at
 https://communities.vmware.com/t5/VMware-Fusion-Documents/The-Unofficial-Fusion-13-for-Apple-Silicon-Companion-Guide/ta-p/2939907
 
 # EXAMPLES
-**./w11arm_esd2iso -l**
-: Display a list of supported Windows 11 ARM languages and their associated
-language tags. 
 
-**./w11arm_esd2iso en-us**
-: Download and build the en-us (US English) language ISO of Windows 11 ARM. 
+**./w11arm_esd2iso**
+: Download and build a Windows 11 ARM ISO. The user will be prompted for both the type
+of ISO to create, and the language of the ISO. 
 
 **./w11arm_esd2iso -r ./esd2iso_work.abcdef**
 : Restart a interrupted download from the point of interruption using the
 work directory ./esd2iso_work.abcdef left behind from a previous run of the utility.
 
 # SEE ALSO
-wiminfo(1), wimextract(1), wimapply(1), aria2c(1), curl(1), hdiutil(1)
+wimlib-imagex(1), aria2c(1), hdiutil(1)
 
 # CREDITS
 Information for obtaining Microsoft ESD distributions and
@@ -148,12 +160,3 @@ forum: https://communities.vmware.com/t5/VMware-Fusion/ct-p/3005-home
 
 If you find an error please run the utility with the -v option, then attach the entire
 output of the utility in a zip file to your post.
-	
-# TODO
-Maybe someday this script will run on Linux and on Intel Macs. No promises.
-
-There are no intentions to make this script run on Windows.
-
-
-	
-

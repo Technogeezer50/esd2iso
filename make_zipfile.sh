@@ -24,9 +24,6 @@ rebuild_bindir() {
 	  cp /opt/local/bin/aria2c ./
 	  cp /opt/local/bin/wimlib-imagex ./
 
-	  ln -s wimlib-imagex wimapply
-	  ln -s wimlib-imagex wiminfo
-	  ln -s wimlib-imagex wimexport
 	)
 
 	# ls -alR "${BINDIR}"
