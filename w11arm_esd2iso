@@ -23,7 +23,7 @@
 #
 
 
-versionID="4.0 (28-June-2023)"
+versionID="4.0.1 (03-July-2023)"
 version="w11arm_esd2iso ${versionID}\n"
 verbosityLevel=0
 bOption=0
@@ -32,6 +32,7 @@ rOption=0
 cmdPath="./bin"
 libPath="./lib"
 minDiskSpace=12
+shaHash=""
 
 declare -a lTags
 declare -a lDesc
@@ -152,7 +153,8 @@ setupEsdDownload(){
 	xpath -q -n -e '//File[LanguageCode="'$esdLang'"]' $workingDir/w11arm_products.xml >$workingDir/esd_edition.xml
 	esdURL=$(xpath -n -q -e '//FilePath' $workingDir/esd_edition.xml | sed -E -e s/'(<FilePath>)|(<\/FilePath>)'//g)
 	buildName=$(xpath -n -q -e '//FileName' $workingDir/esd_edition.xml | sed -E -e s/'(<FileName>)|(\.esd<[\/]FileName>)'//g)
-
+    shaHash=$(xpath -n -q -e '//Sha1' $workingDir/esd_edition.xml | sed -E -e s/'(<Sha1>)|(<\/Sha1>)'//g)
+	
 	esdFile=$workingDir/${buildName}.esd
 	isoFile=./${buildName}.iso
 
@@ -161,6 +163,7 @@ setupEsdDownload(){
 	    echo "\n\tesdURL = $esdURL"
 	    echo "\tbuildName = $buildName"
 	    echo "\tesdFile = $esdFile"
+	    echo "\tshaHash = $shaHash"
 	fi
 
 	echo "Selected language of the ISO is $esdLang"
@@ -176,9 +179,10 @@ setupEsdDownload(){
 	#---------------
 
 	touch $workingDir/restartOK
-	echo "isoFile $isoFile" >> $workingDir/restartOK
-	echo "esdFile $esdFile" >> $workingDir/restartOK
-	echo "esdURL $esdURL" >> $workingDir/restartOK
+	echo "isoFile\t$isoFile" >> $workingDir/restartOK
+	echo "esdFile\t$esdFile" >> $workingDir/restartOK
+	echo "esdURL\t$esdURL" >> $workingDir/restartOK
+	echo "shaHash\t$shaHash" >>  $workingDir/restartOK
 
 	return 0
 }
@@ -189,6 +193,7 @@ downloadEsd() {
 	local retryCount
 	local retryLimit
 	local displayInterval
+	local calculatedHash
 	
 	retryLimit=20
 	retryCount=0
@@ -215,8 +220,8 @@ downloadEsd() {
 		fi
 	done
 
-	if [ $retVal -eq 0 ]; then
-		verboseOn && wimlib-imagex info $esdFile
+	if (( retVal != 0 )); then
+		return $retVal
 	fi
 	return $retVal
 }
@@ -599,15 +604,22 @@ else
 	#---------------
 	
 	extDir=$workingDir/ESD_ISO
-	isoFile=$(cat $workingDir/restartOK | awk '/isoFile/ { print $2 }')
-	esdFile=$(cat $workingDir/restartOK | awk '/esdFile/ { print $2 }')
-	esdURL=$(cat $workingDir/restartOK | awk '/esdURL/ { print $2 }')
+	isoFile="$(grep isoFile $workingDir/restartOK | cut -w -f 1)"
+	esdFile="$(grep esdFile $workingDir/restartOK | cut -w -f 1)"
+	esdURL="$(grep esdURL $workingDir/restartOK | cut -w -f 1)"
+	shaHash="$(grep shaHash $workingDir/restartOK | cut -w -f 1)"
+	
+
+# 	isoFile=$(cat $workingDir/restartOK | awk '/isoFile/ { print $2 }')
+# 	esdFile=$(cat $workingDir/restartOK | awk '/esdFile/ { print $2 }')
+# 	esdURL=$(cat $workingDir/restartOK | awk '/esdURL/ { print $2 }')
 
 	if verboseOn ; then
 		echo "[DEBUG] Variables found in restart file:"
 	    echo "\tesdURL = $esdURL"
 	    echo "\tesdFile = $esdFile"
-	    echo "\tisoFile = $isoFile/n"
+	    echo "\tisoFile = $isoFile"
+	    echo "\tshaHash = $shaHash/n"
 	fi
 
 	echo "Restarting Step 2: Downloading ESD from Microsoft"
@@ -622,6 +634,24 @@ if (( retVal != 0 )); then
 fi
 rm $workingDir/restartOK
 
+echo "\nDownload complete. Validating download (this may take a minute or so)"
+calcHash="$(shasum $esdFile | awk '{print $1}')"
+verboseOn && {
+	echo "[DEBUG] shaHash =  '$shaHash'"
+	echo "        calcHash = '$calcHash'"
+}
+if [[ "$calcHash" != "$shaHash" ]]; then
+	echo "[ERROR] Download validation failed"
+	echo "        Expected hash = $shaHash"
+	echo "        Calculated hash = $calcHash"
+	echo "Re-run $0 - if this error persists, please post a message on the VMware Fusion forum.\n"
+	echo "Work directory $workingDir was not deleted, use for debugging"
+	exit 1
+else
+	echo "Download validated."
+	verboseOn && wimlib-imagex info $esdFile
+fi
+
 echo "\nStep 2 complete - ESD downloaded"	
 
 echo "\nStep 3: Building installation image from ESD distribution"
@@ -634,23 +664,21 @@ if (( retVal != 0 )); then
 fi
 
 #---------------
-#
 # At this point we no longer need the ESD file as it's already extracted
 # In order to reduce disk space reauirements, delete the ESD file unless we
 # have set the environment variable keepDownloads
-#
 #---------------
 
 if [[ "x${keepDownloads}" == "x" ]]; then
-	echo "ESD $esdFile added successfully to installation image\nand is no longer needed. Deleting it to save disk space."
+	echo \n"ESD added successfully to installation image and is no longer needed.\nDeleting it to save disk space."
 	verboseOn && echo "Deleting ESD file ${esdFile}"
 	rm -rf ${esdFile} 
 	retVal=$?
 	if (( retVal != 0 )); then
-		echo "[WARNING] Deletion of $esdFIle encountered a problem."
+		echo "[WARNING] Deletion of ESD file encountered a problem."
 		echo "          The ISO build can continue, but will consume an addtional 5 GB of disk space."
 	else
-		echo "${esdFile} deleted successfully"
+		echo "ESD file deleted successfully\n"
 	fi
 else
 	verboseOn && echo "[DEBUG] keepDownloads is set - keeping ESD download"
@@ -658,7 +686,6 @@ fi
 
 echo "\nStep 3 complete - installation image built"
 	
-
 echo "\nStep 4: Creating ISO $isoFile from the installation image\n"
 
 buildIso $extDir $isoFile
