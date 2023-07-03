@@ -1,5 +1,11 @@
 CHANGELOG
 
+Version 4.0.1 (03-July-2023)
+
+	Version 4.0.1 adds verification of the SHA1 hash of the ESD download to the hash
+	value provided by Microsoft. This will catch rare instances of a
+	corrupted download.  
+
 Version 4.0 (28-June-2023)
 
 	Version 4.0 is now an interactive utility that makes it even easier to create the Windows

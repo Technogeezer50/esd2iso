@@ -1,4 +1,4 @@
-README for w11arm_esd2iso 4.0  (28-June-2023)
+README for w11arm_esd2iso 4.0.1  (03-July-2023)
 
 SUMMARY
 
@@ -21,6 +21,13 @@ Contents of the downloaded zip file:
 	- doc (other documentation and GPL licensing notices)
 	- bin (required open source utilities)
 	- lib (libraries for required open source utiltiies)
+
+CHANGES IN V4.0.1
+
+	Version 4.0.1 verifies the SHA1 hash of the ESD download against the hash
+	value provided by Microsoft. This will catch rare instances of a
+	corrupted download.  
+
 
 CHANGES IN V4.0
 

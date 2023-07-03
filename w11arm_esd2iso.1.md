@@ -1,4 +1,4 @@
-% W11ARM_ESD2ISO(1) w11arm_esd2iso 4.0
+% W11ARM_ESD2ISO(1) w11arm_esd2iso 4.0.1
 % Paul Rockwell (@Technogeezer on VMware Fusion forum)
 % June 2023
 
@@ -116,7 +116,11 @@ complete the download. In all honesty, it shouldn't need to be used more than
 once unless you have a really, really bad network connection. Each restart attempt
 using the -r option will resume a download from the point of interruption of the
 last execution of the utility. 
-			
+
+w11arm_esd2iso will verify the SHA1 hash of the downloaded ESD file against the hash value
+provided by Microsoft. If the verification fails (indicating a corrupt
+download), the utility will exit with an error message.
+
 More extensive guidance on the use of w11arm_esd2iso to create Windows 11 ARM virtual
 machines with VMware Fusion 13 on Apple Silicon can be found in the 
 Unofficial Fusion 13 for Apple Silicon Companion Guide which can be found at
