@@ -619,7 +619,7 @@ else
 	    echo "\tesdURL = $esdURL"
 	    echo "\tesdFile = $esdFile"
 	    echo "\tisoFile = $isoFile"
-	    echo "\tshaHash = $shaHash/n"
+	    echo "\tshaHash = $shaHash\n"
 	fi
 
 	echo "Restarting Step 2: Downloading ESD from Microsoft"
