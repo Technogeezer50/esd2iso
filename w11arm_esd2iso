@@ -23,7 +23,7 @@
 #
 
 
-versionID="4.0.1 (03-July-2023)"
+versionID="4.0.2 (13-July-2023)"
 version="w11arm_esd2iso ${versionID}\n"
 verbosityLevel=0
 bOption=0
@@ -33,6 +33,23 @@ cmdPath="./bin"
 libPath="./lib"
 minDiskSpace=12
 shaHash=""
+
+#-------------
+# Bug fix 13-July-2023
+#
+# In some cases, open source versions of some *NIX utilities do not have the
+# same functionality as the ones bundled with macOS. This can cause this utility to
+# fail (the reported case was unable to extract the catalog file from Microsoft cab download)
+#
+# Ensure that we use macOS versions of utilities with known behavior so that
+# they will not be overridden by versions installed via Homebrew or
+# MacPorts
+#-------------
+tar="/usr/bin/tar"
+xpath="/usr/bin/xpath"
+sed="/usr/bin/sed"
+hdiutil="/usr/bin/hdiutil"
+awk="/usr/bin/awk"
 
 declare -a lTags
 declare -a lDesc
@@ -115,7 +132,7 @@ downloadCatalog() {
     retVal=$?
 	(( retVal != 0 )) && return $retVal
 
-	( cd $wDir; tar xf catalog.cab products.xml; sed -i .bak 's/\r//' products.xml )
+	( cd $wDir; $tar xf catalog.cab products.xml; $sed -i .bak 's/\r//' products.xml )
 
 	
 	#
@@ -123,7 +140,7 @@ downloadCatalog() {
 	#
 	echo '<Catalog>' > $wDir/w11arm_products.xml
 		
-	xpath -q -n -e $edQuery $wDir/products.xml >> $wDir/w11arm_products.xml
+	$xpath -q -n -e $edQuery $wDir/products.xml >> $wDir/w11arm_products.xml
 	
 	echo '</Catalog>'>> $wDir/w11arm_products.xml
 
@@ -131,9 +148,9 @@ downloadCatalog() {
 	# Load the available languages into arrays for future processing
 	# 
 	
-    for ltg in $(xpath -q -n -e '//File/LanguageCode' $wDir/w11arm_products.xml | sed -E -e s/"<[\/]?LanguageCode>"//g | sort); do
+    for ltg in $($xpath -q -n -e '//File/LanguageCode' $wDir/w11arm_products.xml | $sed -E -e s/"<[\/]?LanguageCode>"//g | sort); do
     	lTags+=("$ltg")
-    	lDesc+=("$(xpath -q -n -e '//File[LanguageCode="'$ltg'"]/Language' $workingDir/w11arm_products.xml | sed -E -e s/'(<Language>)|(<\/Language>)'//g )")
+    	lDesc+=("$($xpath -q -n -e '//File[LanguageCode="'$ltg'"]/Language' $workingDir/w11arm_products.xml | $sed -E -e s/'(<Language>)|(<\/Language>)'//g )")
     done
 	echo "Processing complete"
 	return 0
@@ -150,10 +167,10 @@ setupEsdDownload(){
 	# and the name of the ISO we're going to generate
 	#---------------
 	
-	xpath -q -n -e '//File[LanguageCode="'$esdLang'"]' $workingDir/w11arm_products.xml >$workingDir/esd_edition.xml
-	esdURL=$(xpath -n -q -e '//FilePath' $workingDir/esd_edition.xml | sed -E -e s/'(<FilePath>)|(<\/FilePath>)'//g)
-	buildName=$(xpath -n -q -e '//FileName' $workingDir/esd_edition.xml | sed -E -e s/'(<FileName>)|(\.esd<[\/]FileName>)'//g)
-    shaHash=$(xpath -n -q -e '//Sha1' $workingDir/esd_edition.xml | sed -E -e s/'(<Sha1>)|(<\/Sha1>)'//g)
+	$xpath -q -n -e '//File[LanguageCode="'$esdLang'"]' $workingDir/w11arm_products.xml >$workingDir/esd_edition.xml
+	esdURL=$($xpath -n -q -e '//FilePath' $workingDir/esd_edition.xml | $sed -E -e s/'(<FilePath>)|(<\/FilePath>)'//g)
+	buildName=$($xpath -n -q -e '//FileName' $workingDir/esd_edition.xml | $sed -E -e s/'(<FileName>)|(\.esd<[\/]FileName>)'//g)
+    shaHash=$($xpath -n -q -e '//Sha1' $workingDir/esd_edition.xml | $sed -E -e s/'(<Sha1>)|(<\/Sha1>)'//g)
 	
 	esdFile=$workingDir/${buildName}.esd
 	isoFile=./${buildName}.iso
@@ -248,7 +265,7 @@ extractEsd(){
 	
 	verboseOn && beQuiet=""
 	
-	esdImageCount=$(wimlib-imagex info $eFile | awk '/Image Count:/ {print $3}')
+	esdImageCount=$(wimlib-imagex info $eFile | $awk '/Image Count:/ {print $3}')
 	verboseOn && echo "[DEBUG] image count in ESD: $esdImageCount"
 	(( $esdImageCount == 6 )) && images+=("6")
 
@@ -343,7 +360,7 @@ buildIso(){
 	# Create the ISO file
 	#
 
-	hdiutil makehybrid -o $iFile -iso -udf -hard-disk-boot -eltorito-boot $elToritoBootFile $iDir
+	$hdiutil makehybrid -o $iFile -iso -udf -hard-disk-boot -eltorito-boot $elToritoBootFile $iDir
 	return $?
 }
 
@@ -466,7 +483,7 @@ if (( rOption == 0 )) ; then
 	#---------------
 	
 		
-	freeSpace=$(df -g . | awk '/dev.*/ {print $4}')
+	freeSpace=$(df -g . | $awk '/dev.*/ {print $4}')
 	verboseOn && echo "[DEBUG] Free space is $freeSpace GB"
 	if (( freeSpace < minDiskSpace )) ; then
 		echo "[ERROR] You have insufficent space on this disk to complete the ISO build."
@@ -635,7 +652,7 @@ fi
 rm $workingDir/restartOK
 
 echo "\nDownload complete. Validating download (this may take a minute or so)"
-calcHash="$(shasum $esdFile | awk '{print $1}')"
+calcHash="$(shasum $esdFile | $awk '{print $1}')"
 verboseOn && {
 	echo "[DEBUG] shaHash =  '$shaHash'"
 	echo "        calcHash = '$calcHash'"
