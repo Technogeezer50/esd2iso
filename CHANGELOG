@@ -1,5 +1,12 @@
 CHANGELOG
 
+Version 4.0.3 (17-September-2023)
+
+	Bug fix: w11arm_esd2iso would fail with error 134 when trying to download the catalog information
+	from Microsoft when running under macOS Sonoma. This error was due to an issue
+	with the aria2c utility that w11arm_esd2iso uses. This issue was fixed by setting an
+	environment variable recommended by the aria2c developers. 
+
 Version 4.0.2 (13-July-2023)
 
 	Version 4.0.2 fixes a bug where installation of an open-source version of 'tar' 

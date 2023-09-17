@@ -1,6 +1,6 @@
-% W11ARM_ESD2ISO(1) w11arm_esd2iso 4.0.2
+% W11ARM_ESD2ISO(1) w11arm_esd2iso 4.0.3
 % Paul Rockwell (@Technogeezer on VMware Fusion forum)
-% July 2023
+% September 2023
 
 # NAME
 w11arm_esd2iso - utility to build Windows 11 ARM ISOs from Microsoft ESD files
