@@ -1,4 +1,4 @@
-README for w11arm_esd2iso 4.0.2  (13-July-2023)
+README for w11arm_esd2iso 4.0.4  (2023-10-05)
 
 SUMMARY
 
@@ -22,13 +22,11 @@ Contents of the downloaded zip file:
 	- bin (required open source utilities)
 	- lib (libraries for required open source utiltiies)
 
-CHANGES IN V4.0.2
+CHANGES IN V4.0.4
 
-	Version 4.0.2 fixes a bug where installation of an open-source version of 'tar' 
-	through Homebrew or MacPorts caused a failure to extract the Windows 11 catalog of
-	available downloads. This bug is fixed by explicitly invoking the 'tar' utility
-	using its full path instead of relying on it being found through the PATH variable.
-	
+	Version 4.0.4 fixes a bug that prevented interrupted downloads from
+	restarting with the -r option. 
+		
 See the CHANGELOG document in the doc folder for changes made in prior versions.
 
 EXAMPLES

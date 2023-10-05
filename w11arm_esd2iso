@@ -23,7 +23,7 @@
 #
 
 
-versionID="4.0.3 (17-September-2023)"
+versionID="4.0.4 (2023-10-05)"
 version="w11arm_esd2iso ${versionID}\n"
 verbosityLevel=0
 bOption=0
@@ -35,7 +35,7 @@ minDiskSpace=12
 shaHash=""
 
 #-------------
-# Bug fix 13-July-2023
+# Bug fix 2023-07-13 PER
 #
 # In some cases, open source versions of some *NIX utilities do not have the
 # same functionality as the ones bundled with macOS. This can cause this utility to
@@ -372,7 +372,7 @@ buildIso(){
 #-------------------
 
 #-------------------
-# Bug fix - 16-Sept-2023 PER
+# Bug fix - 2023-09-16 PER
 #
 # aria2c seems to have an issue with Sonoma: https://github.com/aria2/aria2/issues/2083
 # This results in an error 134 that was displayed when trying to download the 
@@ -446,7 +446,7 @@ if [[ ! -d ${cmdPath} ]] || [[ ! -d ${libPath} ]]; then
 fi
 
 #--------------------
-# Bug fix 21-May-2023
+# Bug fix 2023-05-21 PER
 # 
 # Downloading the zip file using Safai (maybe others) will result in the
 # com.apple.quarantine flag being set on the extracted files. When the utility
@@ -631,11 +631,20 @@ else
 	#
 	#---------------
 	
+	#---------------
+	# Bug Fix 2023-10-14 PER
+	#
+	# Serious Brain cramp is now fixed...
+	# Fields for the 'cut' command start at 1, not 0, and we want the
+	# second field that contains the data, not the first that has the variable
+	# label
+	#---------------
+	
 	extDir=$workingDir/ESD_ISO
-	isoFile="$(grep isoFile $workingDir/restartOK | cut -w -f 1)"
-	esdFile="$(grep esdFile $workingDir/restartOK | cut -w -f 1)"
-	esdURL="$(grep esdURL $workingDir/restartOK | cut -w -f 1)"
-	shaHash="$(grep shaHash $workingDir/restartOK | cut -w -f 1)"
+	isoFile="$(grep isoFile $workingDir/restartOK | cut -w -f 2)"
+	esdFile="$(grep esdFile $workingDir/restartOK | cut -w -f 2)"
+	esdURL="$(grep esdURL $workingDir/restartOK | cut -w -f 2)"
+	shaHash="$(grep shaHash $workingDir/restartOK | cut -w -f 2)"
 	
 
 # 	isoFile=$(cat $workingDir/restartOK | awk '/isoFile/ { print $2 }')
@@ -709,7 +718,7 @@ if [[ "x${keepDownloads}" == "x" ]]; then
 		echo "ESD file deleted successfully\n"
 	fi
 else
-	verboseOn && echo "[DEBUG] keepDownloads is set - keeping ESD download"
+	echo "[DEBUG] keepDownloads is set - keeping ESD download"
 fi
 
 echo "\nStep 3 complete - installation image built"
@@ -725,7 +734,11 @@ if (( retVal != 0 )); then
 fi
 
 echo "Step 4 complete - ISO created"
-echo "\nCleaning up work directory"
-rm -rf $workingDir
+if [[ "x${keepDownloads}" == "x" ]]; then
+	echo "\nCleaning up work directory"
+	rm -rf $workingDir
+else
+	echo "[DEBUG] keepDownloads is set - Work directory $workingDir is still available for debugging"
+fi
 echo "Done!"
 exit 0

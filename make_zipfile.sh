@@ -45,8 +45,8 @@ rebuild_libdir() {
 	mkdir "$LIBDIR"
 	( cd "$LIBDIR"
 
-	  cp -R /opt/local/lib/libgmp*.dylib ./
-	  cp -R /opt/local/lib/libgmpxx*.dylib ./
+	  # cp -R /opt/local/lib/libgmp*.dylib ./
+	  # cp -R /opt/local/lib/libgmpxx*.dylib ./
 	  cp -R /opt/local/lib/libiconv*.dylib ./
 	  cp -R /opt/local/lib/libicudata*.dylib ./
 	  cp -R /opt/local/lib/libicui18n*.dylib ./

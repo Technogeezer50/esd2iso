@@ -1,28 +1,36 @@
 CHANGELOG
 
-Version 4.0.3 (17-September-2023)
+Version 4.0.4 (2023-10-05)
+
+	Bug fix: Failure to restart interrupted downloads using the -r option. Let's just say a pretty 
+	egregious error made its way into the code and should have been caught before
+	now. The author now has a serious red face because of this.
+	
+	All dates in this document now are formatted to ISO 8601 standards (YYYY-MM-DD).
+
+Version 4.0.3 (2023-09-17)
 
 	Bug fix: w11arm_esd2iso would fail with error 134 when trying to download the catalog information
 	from Microsoft when running under macOS Sonoma. This error was due to an issue
 	with the aria2c utility that w11arm_esd2iso uses. This issue was fixed by setting an
 	environment variable recommended by the aria2c developers. 
 
-Version 4.0.2 (13-July-2023)
+Version 4.0.2 (2023-07-13)
 
-	Version 4.0.2 fixes a bug where installation of an open-source version of 'tar' 
+	Bug fix: Installation of an open-source version of 'tar' 
 	through Homebrew or MacPorts caused a failure to extract the Windows 11 catalog of
 	available downloads. This bug was caused by an open-source version of 'tar' being
 	installed by Homebrew and found on the user's PATH variable before the macOS 
 	installed version. Thie bug is fixed by invoking the 'tar' utility using its full 
 	path instead of relying on it being found through the PATH variable.
 	
-Version 4.0.1 (03-July-2023)
+Version 4.0.1 (2023-07-03)
 
 	Version 4.0.1 adds verification of the SHA1 hash of the ESD download to the hash
 	value provided by Microsoft. This will catch rare instances of a
 	corrupted download.  
 
-Version 4.0 (28-June-2023)
+Version 4.0 (2023-06-28)
 
 	Version 4.0 is now an interactive utility that makes it even easier to create the Windows
 	11 ARM ISO.  
@@ -58,17 +66,17 @@ Version 4.0 (28-June-2023)
 	process. 
 	 
 	
-Version 3.0.1 (21-May-2023)
+Version 3.0.1 (2023-05-21)
 
-	Version 3.0 would display macOS Gatekeeper errors such as "unidentified
-	developer" and "unable to verify with Apple" which prevented the utility from running.
+	Bug fix: macOS Gatekeeper errors such as "unidentified
+	developer" and "unable to verify with Apple" prevented the utility from running.
 	These errors were displayed when the the utility tried to run any of the bundled open source
 	components.
 	The errors could be worked around, but would require multiple
 	manual interventions by the user to allow w11arm_esd2iso to run.
-	This has been fixed in 3.0.1, and no manual intevention by the user is required.
+	This has been fixed and no manual intevention by the user is required.
 
-Version 3.0 (19-May-2023)	
+Version 3.0 (2023-05-19)	
 
 	Now released under GPLv2 license.
 
@@ -87,7 +95,7 @@ Version 3.0 (19-May-2023)
 	Removal of -a option - aria2c is used for all downloads and restarts are
 	automatically enabled.
 	
-Version 2.1 (22-Mar-2023)
+Version 2.1 (2023-03-22)
 
 	Additional checks for required utilities. 
 	
@@ -96,7 +104,7 @@ Version 2.1 (22-Mar-2023)
 	
 	Examples now appear in the README file
 
-Version 2.0 (15-Mar-2023)
+Version 2.0 (2023-03-15)
 
 	Enhanced error detection.
 	
