@@ -23,7 +23,7 @@ rebuild_bindir() {
 
 	  cp /opt/local/bin/aria2c ./
 	  cp /opt/local/bin/wimlib-imagex ./
-
+	  cp /opt/local/bin/cabextract ./
 	)
 
 	# ls -alR "${BINDIR}"

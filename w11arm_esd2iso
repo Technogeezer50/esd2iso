@@ -23,7 +23,7 @@
 #
 
 
-versionID="4.0.4 (2023-10-05)"
+versionID="4.1 (2023-10-05)"
 version="w11arm_esd2iso ${versionID}\n"
 verbosityLevel=0
 bOption=0
@@ -45,17 +45,17 @@ shaHash=""
 # they will not be overridden by versions installed via Homebrew or
 # MacPorts
 #-------------
-tar="/usr/bin/tar"
-xpath="/usr/bin/xpath"
-sed="/usr/bin/sed"
-hdiutil="/usr/bin/hdiutil"
-awk="/usr/bin/awk"
+# tar="/usr/bin/tar"
+xpath=/usr/bin/xpath
+sed=/usr/bin/sed
+hdiutil=/usr/bin/hdiutil
+awk=/usr/bin/awk
 
 declare -a lTags
 declare -a lDesc
 
 
-requires="wimlib-imagex aria2c"
+requires="wimlib-imagex aria2c cabextract"
 requiredLibs="libcrypto libgmp libgmpxx libiconv libicudata libicui18n libicuio libicutest libicutu libicuuc libintl liblzma libuv libwim libxml2 libz"
 
 usage() {
@@ -89,7 +89,7 @@ printLanguages() {
 	printf '%-20s %-30s\n' "Language tag"	"Language"
 	printf '%-20s %-30s\n'  "------------" "--------------------"
     while (( i <= ${#lTags[@]} )); do
-    	printf '%-20s %-30s\n' "${lTags[$i]}" "${lDesc[$i]}"
+    	printf '%-20s %-30s\n' ${lTags[$i]} "${lDesc[$i]}"
 		let i++
     done
     return 0
@@ -106,8 +106,8 @@ downloadCatalog() {
 	editionType=$2
 
 	
-	if [ ! -d $wDir ]; then
-		echo "[ERROR] $wDir is expected to exist for downloadCatalog but doesn't"
+	if [ ! -d ${wDir} ]; then
+		echo "[ERROR] ${wDir} is expected to exist for downloadCatalog but doesn't"
 		echo "Please report this error"
 		exit 1
 	fi
@@ -127,30 +127,36 @@ downloadCatalog() {
 	
 	echo "\nPlease wait while information is being downloaded from Microsoft for the $editionName ESDs"
 	
-	aria2c --dir="$wDir" --out=catalog.cab --download-result=hide "https://go.microsoft.com/fwlink?linkid=2156292"
+	aria2c --dir="${wDir}" --out=catalog.cab --download-result=hide "https://go.microsoft.com/fwlink?linkid=2156292"
 	# curl -L "https://go.microsoft.com/fwlink?linkid=2156292" $showMeter -o $wDir/catalog.cab
     retVal=$?
-	(( retVal != 0 )) && return $retVal
+	(( retVal != 0 )) && return ${retVal}
 
-	( cd $wDir; $tar xf catalog.cab products.xml; $sed -i .bak 's/\r//' products.xml )
+	#( cd $wDir; $tar xf catalog.cab products.xml; $sed -i .bak 's/\r//' products.xml )
+	
+	(
+		cd ${wDir}; 
+		cabextract catalog.cab; 
+		${sed} -i .bak 's/\r//' products.xml 
+	)
 
 	
 	#
 	# Get only the W11 Pro ARM64 products
 	#
-	echo '<Catalog>' > $wDir/w11arm_products.xml
+	echo '<Catalog>' > ${wDir}/w11arm_products.xml
 		
-	$xpath -q -n -e $edQuery $wDir/products.xml >> $wDir/w11arm_products.xml
+	"${xpath}" -q -n -e ${edQuery} ${wDir}/products.xml >> ${wDir}/w11arm_products.xml
 	
-	echo '</Catalog>'>> $wDir/w11arm_products.xml
+	echo '</Catalog>'>> ${wDir}/w11arm_products.xml
 
 	#
 	# Load the available languages into arrays for future processing
 	# 
 	
-    for ltg in $($xpath -q -n -e '//File/LanguageCode' $wDir/w11arm_products.xml | $sed -E -e s/"<[\/]?LanguageCode>"//g | sort); do
-    	lTags+=("$ltg")
-    	lDesc+=("$($xpath -q -n -e '//File[LanguageCode="'$ltg'"]/Language' $workingDir/w11arm_products.xml | $sed -E -e s/'(<Language>)|(<\/Language>)'//g )")
+    for ltg in $(${xpath} -q -n -e '//File/LanguageCode' ${wDir}/w11arm_products.xml | $sed -E -e s/"<[\/]?LanguageCode>"//g | sort); do
+    	lTags+=("${ltg}")
+    	lDesc+=("$(${xpath} -q -n -e '//File[LanguageCode="'$ltg'"]/Language' ${workingDir}/w11arm_products.xml | $sed -E -e s/'(<Language>)|(<\/Language>)'//g )")
     done
 	echo "Processing complete"
 	return 0
@@ -167,26 +173,26 @@ setupEsdDownload(){
 	# and the name of the ISO we're going to generate
 	#---------------
 	
-	$xpath -q -n -e '//File[LanguageCode="'$esdLang'"]' $workingDir/w11arm_products.xml >$workingDir/esd_edition.xml
-	esdURL=$($xpath -n -q -e '//FilePath' $workingDir/esd_edition.xml | $sed -E -e s/'(<FilePath>)|(<\/FilePath>)'//g)
-	buildName=$($xpath -n -q -e '//FileName' $workingDir/esd_edition.xml | $sed -E -e s/'(<FileName>)|(\.esd<[\/]FileName>)'//g)
-    shaHash=$($xpath -n -q -e '//Sha1' $workingDir/esd_edition.xml | $sed -E -e s/'(<Sha1>)|(<\/Sha1>)'//g)
+	${xpath} -q -n -e '//File[LanguageCode="'${esdLang}'"]' ${workingDir}/w11arm_products.xml >${workingDir}/esd_edition.xml
+	esdURL=$(${xpath} -n -q -e '//FilePath' ${workingDir}/esd_edition.xml | ${sed} -E -e s/'(<FilePath>)|(<\/FilePath>)'//g)
+	buildName=$(${xpath} -n -q -e '//FileName' ${workingDir}/esd_edition.xml| ${sed} -E -e s/'(<FileName>)|(\.esd<[\/]FileName>)'//g)
+    shaHash=$(${xpath} -n -q -e '//Sha1' ${workingDir}/esd_edition.xml | ${sed} -E -e s/'(<Sha1>)|(<\/Sha1>)'//g)
 	
-	esdFile=$workingDir/${buildName}.esd
+	esdFile=${workingDir}/${buildName}.esd
 	isoFile=./${buildName}.iso
 
 	if verboseOn ; then
 	    echo "[DEBUG] ESD Download variables"
-	    echo "\n\tesdURL = $esdURL"
-	    echo "\tbuildName = $buildName"
-	    echo "\tesdFile = $esdFile"
-	    echo "\tshaHash = $shaHash"
+	    echo "\n\tesdURL = ${esdURL}"
+	    echo "\tbuildName = ${buildName}"
+	    echo "\tesdFile = ${esdFile}"
+	    echo "\tshaHash = ${shaHash}"
 	fi
 
-	echo "Selected language of the ISO is $esdLang"
+	echo "Selected language of the ISO is ${esdLang}"
 	# xpath -n -q -e '//Language' $workingDir/esd_edition.xml | sed -E -e s/'(<Language>)|(<\/Language>)'//g
 	# verboseOn && echo "[DEBUG] The ESD will be downloaded from\n$esdURL"
-	echo "The generated ISO will be $isoFile"
+	echo "The generated ISO will be ${isoFile}"
 	
 	#---------------
 	#
@@ -195,11 +201,11 @@ setupEsdDownload(){
 	#
 	#---------------
 
-	touch $workingDir/restartOK
-	echo "isoFile\t$isoFile" >> $workingDir/restartOK
-	echo "esdFile\t$esdFile" >> $workingDir/restartOK
-	echo "esdURL\t$esdURL" >> $workingDir/restartOK
-	echo "shaHash\t$shaHash" >>  $workingDir/restartOK
+	touch ${workingDir}/restartOK
+	echo "isoFile\t${isoFile}" >> ${workingDir}/restartOK
+	echo "esdFile\t${esdFile}" >> ${workingDir}/restartOK
+	echo "esdURL\t${esdURL}"   >> ${workingDir}/restartOK
+	echo "shaHash\t${shaHash}" >> ${workingDir}/restartOK
 
 	return 0
 }
@@ -226,7 +232,7 @@ downloadEsd() {
 	do
 		let retryCount+=1
 		echo "ESD Download attempt $retryCount"
-		aria2c --summary-interval=$displayInterval --dir="$workingDir" --file-allocation=none "$esdURL"
+		aria2c --summary-interval=${displayInterval} --dir="${workingDir}" --file-allocation=none "${esdURL}"
 		retVal=$?
 		(( retVal == 0 )) && break;
 		echo "Download interrupted, \c"
@@ -237,9 +243,9 @@ downloadEsd() {
 		fi
 	done
 
-	if (( retVal != 0 )); then
-		return $retVal
-	fi
+# 	if (( retVal != 0 )); then
+# 		return ${retVal}
+# 	fi
 	return $retVal
 }
 
@@ -259,22 +265,22 @@ extractEsd(){
 	eFile=$1
 	eDir=$2
 	beQuiet="--quiet"
-	bootWimFile=$eDir/sources/boot.wim
-	installWimFile=$eDir/sources/install.wim
-	images=("4" "5")
+	bootWimFile=${eDir}/sources/boot.wim
+	installWimFile=${eDir}/sources/install.wim
+	images=(4 5)
 	
 	verboseOn && beQuiet=""
 	
-	esdImageCount=$(wimlib-imagex info $eFile | $awk '/Image Count:/ {print $3}')
+	esdImageCount=$(wimlib-imagex info ${eFile} | $awk '/Image Count:/ {print $3}')
 	verboseOn && echo "[DEBUG] image count in ESD: $esdImageCount"
-	(( $esdImageCount == 6 )) && images+=("6")
+	(( esdImageCount == 6 )) && images+=(6)
 
 	#---------------
 	# Extract image 1 in the ESD to create the boot environment
 	#---------------
 
 	echo "\nApplying boot files to the image"
-	wimlib-imagex apply $eFile 1 $eDir $beQuiet 2>/dev/null
+	wimlib-imagex apply $eFile 1 ${eDir} $beQuiet 2>/dev/null
 	retVal=$?
 	if (( retVal != 0 )); then
 		echo "[ERROR] Extract of boot files failed"
@@ -292,14 +298,14 @@ extractEsd(){
 	#---------------
 
 	echo "\nAdding WinPE and Windows Setup to the image"
-	wimlib-imagex export $eFile 2 $bootWimFile --compress=LZX --chunk-size 32K $beQuiet
+	wimlib-imagex export ${eFile} 2 ${bootWimFile} --compress=LZX --chunk-size 32K ${beQuiet}
 	retVal=$?
 	if (( retVal != 0 )); then
 		echo "[ERROR] Add of WinPE failed"
 		return $retVal
 	fi
 
-	wimlib-imagex export $eFile 3 $bootWimFile --compress=LZX --chunk-size 32K --boot $beQuiet
+	wimlib-imagex export ${eFile} 3 $bootWimFile --compress=LZX --chunk-size 32K --boot ${beQuiet}
 	retVal=$?
 	if (( retVal != 0 )); then
 		echo "[ERROR] Add of Windows Setup failed"
@@ -308,8 +314,8 @@ extractEsd(){
 	echo "WinPE and Windows Setup added successfully to image\n"
 	
 	verboseOn && {
-		echo "[DEBUG] contents of $bootWimFile"
-		wimlib-imagex info  $bootWimFile
+		echo "[DEBUG] contents of ${bootWimFile}"
+		wimlib-imagex info  ${bootWimFile}
 	}
 
 
@@ -319,23 +325,23 @@ extractEsd(){
 	#---------------
 	
 	for imageIndex in ${images[*]}; do
-		imageEdition="$(wimlib-imagex info $eFile $imageIndex | grep '^Description:' | sed 's/Description:[ \t]*//')"
+		imageEdition="$(wimlib-imagex info ${eFile} ${imageIndex} | grep '^Description:' | sed 's/Description:[ \t]*//')"
 		echo "\nAdding $imageEdition to the image"
-		wimlib-imagex export $eFile $imageIndex $installWimFile --compress=LZMS --chunk-size 128K $beQuiet
+		wimlib-imagex export ${eFile} ${imageIndex} ${installWimFile} --compress=LZMS --chunk-size 128K ${beQuiet}
 		retVal=$?
 		if (( retVal != 0 )); then
-			echo "[ERROR] Addition of $imageIndex to the image failed"
+			echo "[ERROR] Addition of ${imageIndex} to the image failed"
 			return $retVal
 		fi
-		echo "$imageEdition added successfully to the image"
+		echo "${imageEdition} added successfully to the image"
 
 	done
 
 	echo "\nAll Windows editions added to image"	
 	
 	verboseOn && {
-		echo "[DEBUG] contents of $installWimFile"
-		wimlib-imagex info $installWimFile
+		echo "[DEBUG] contents of ${installWimFile}"
+		wimlib-imagex info ${installWimFile}
 	}
 	
 	return 0
@@ -344,24 +350,31 @@ extractEsd(){
 buildIso(){
 	local iDir=$1
 	local iFile=$2
-	local elToritoBootFile
+	local bootFile="efi/microsoft/boot/efisys.bin"
+	local $retVal
 	
-	iDir=$1
-	iFile=$2
+# 	iDir=$1
+# 	iFile=$2
 	
-	if [ -e $iFile ]; then
-	  echo "\t[INFO] File $iFile exists, removing it"
-	  rm -rf $iFile
+	if [ -e ${iFile} ]; then
+	  echo "\t[INFO] File ${iFile} exists, removing it"
+	  rm -rf ${iFile}
 	fi
 
-	elToritoBootFile=$iDir/efi/microsoft/boot/efisys.bin
+	#------------
+	# Create the ISO file. Use mkisofs if it can be found, else use the built-in
+	# macOS hdiutil
+	#------------
+		
+    if  /usr/bin/which -s mkisofs ; then
+	    mkisofs -b ${bootFile} --no-emul-boot --udf -iso-level 3 --hide "*" -V "ESD_ISO" -o ${iFile} $iDir
+		retVal=$?   
+    else
+		${hdiutil} makehybrid -o ${iFile} -iso -udf -hard-disk-boot -eltorito-boot ${iDir}/${bootFile} -default-volume-name "ESD_ISO" ${iDir}
+		retVal=$?	
+	fi
 	
-	#
-	# Create the ISO file
-	#
-
-	$hdiutil makehybrid -o $iFile -iso -udf -hard-disk-boot -eltorito-boot $elToritoBootFile $iDir
-	return $?
+	return $retVal
 }
 
 
@@ -390,7 +403,7 @@ export LC_MESSAGES="C"
 #-------------------
 
 while getopts ":hr:vV" opt; do
-  case $opt in
+  case ${opt} in
     h)
     	usage
     	exit 1
@@ -439,7 +452,7 @@ if (( $# > 0 )); then
 	exit 1
 fi
 
-if [[ ! -d ${cmdPath} ]] || [[ ! -d ${libPath} ]]; then
+if [[ ! -d "${cmdPath}" ]] || [[ ! -d "${libPath}" ]]; then
 	echo "[ERROR] Your current working directory $(pwd) is not the directory where $0 was unzipped";
 	echo "        Please change your working directory to the directory where you unzipped this utility and rerun it from there"
 	exit 1
@@ -466,24 +479,31 @@ else
 fi    
 
 
-#-------------------
-# Check if required utilities are already installed with MacPorts or
-# Homebrew. If they aren't use the bundled version from the download
-#-------------------
+# #-------------------
+# # Check if required utilities are already installed with MacPorts or
+# # Homebrew. If they aren't use the bundled version from the download
+# #-------------------
+# 
+# if /usr/bin/which -s $requires ; then
+# 	echo "[INFO] Required utilities $requires are already installed by \n      Homebrew or MacPorts, They will be used instead of the bundled versions."
+# else
+# 	# 
+# 	# Set the environment variables necessary for the utility to find and run the bundled
+# 	# open source utilities 
+# 	#
+#     echo "[INFO] Using bundled utilities"
+# 	PATH="${cmdPath}:${PATH}"
+# 	export DYLD_FALLBACK_LIBRARY_PATH="$libPath"
+# 	verboseOn && echo "[DEBUG] PATH is now set to $PATH"
+# 	verboseOn && echo "[DEBUG] DYLD_FALLBACK_LIBRARY_PATH is now set to $DYLD_FALLBACK_LIBRARY_PATH"
+# fi
 
-if /usr/bin/which -s $requires ; then
-	echo "[INFO] Required utilities $requires are already installed by \n      Homebrew or MacPorts, They will be used instead of the bundled versions."
-else
-	# 
-	# Set the environment variables necessary for the utility to find and run the bundled
-	# open source utilities 
-	#
-    echo "[INFO] Using bundled utilities"
-	PATH="${cmdPath}:${PATH}"
-	export DYLD_FALLBACK_LIBRARY_PATH="$libPath"
-	verboseOn && echo "[DEBUG] PATH is now set to $PATH"
-	verboseOn && echo "[DEBUG] DYLD_FALLBACK_LIBRARY_PATH is now set to $DYLD_FALLBACK_LIBRARY_PATH"
-fi
+echo "[INFO] Using bundled utilities"
+PATH="${cmdPath}:${PATH}"
+export DYLD_FALLBACK_LIBRARY_PATH="$libPath"
+verboseOn && echo "[DEBUG] PATH is now set to $PATH"
+verboseOn && echo "[DEBUG] DYLD_FALLBACK_LIBRARY_PATH is now set to $DYLD_FALLBACK_LIBRARY_PATH"
+
 
 if (( rOption == 0 )) ; then
 
@@ -519,7 +539,7 @@ if (( rOption == 0 )) ; then
 		echo "      'q' to exit the program without creating an ISO: \c"
 		read answer
 
-		case $answer in
+		case ${answer} in
 			h | H )
 				echo "\nWindows 11 ARM Home/Professional ISO will be created."
 				bOption=0
@@ -543,11 +563,11 @@ if (( rOption == 0 )) ; then
 		echo "[ERROR] Unable to create work directory, exiting"
 		exit 1
 	fi
-	downloadCatalog $workingDir $bOption
+	downloadCatalog ${workingDir} ${bOption}
 	retVal=$?
 	if (( retVal != 0 )); then
 		echo "[ERROR] Catalog download failed with error $retVal"
-		rm -rf $workingDir
+		rm -rf ${workingDir}
 		exit 1
 	fi
 
@@ -558,41 +578,40 @@ if (( rOption == 0 )) ; then
 	#
 	##---------------
 
-	extDir=$workingDir/ESD_ISO
-	mkdir $extDir
-
+	extDir=${workingDir}/ESD_ISO
+	mkdir ${extDir}
 	echo "\n\nPlease select a language for your Windows 11 ARM ISO.\n"
 	printLanguages
 	esdLang=""
-	while [[ "x$esdLang" == "x" ]]; do
+	while [[ "x${esdLang}" == "x" ]]; do
 
 		echo "\nEnter a language tag from the 'Language Tag' colummn of the list, or"
 		echo "'list' to reprint the list of languages, or"
 		echo "'quit' to exit the program without creating an ISO: \c"
 		read answer
 
-		if [[ $answer == "quit" ]]; then
+		if [[ ${answer} == "quit" ]]; then
 			echo "Exiting progam. No ISO will be created"
-			rm -rf $workingDir
+			rm -rf "${workingDir}"
 			exit 0
 		fi
-		if [[ $answer == 'list' ]]; then
+		if [[ ${answer} == 'list' ]]; then
 			printLanguages
 			continue
 		fi
 		
 		found=0
 	    for i in ${lTags[*]}; do
-			if [[ $answer == $i ]]; then 
+			if [[ ${answer} == $i ]]; then 
 				found=1; 
 				break
 			fi;
 		done
 
 		if (( found == 0 )); then
-		  echo "$answer is not a valid language tag. Please try again"
+		  echo "${answer} is not a valid language tag. Please try again"
 		else
-		  esdLang="$answer"
+		  esdLang=${answer}
 		fi
 	done
 	
@@ -615,15 +634,15 @@ else
 	#
 	#---------------
 	
-	if [ ! -d $workingDir ]; then
-		echo "[ERROR] Work directory $workingDir does not exist, exiting"
+	if [ ! -d ${workingDir} ]; then
+		echo "[ERROR] Work directory ${workingDir} does not exist, exiting"
 		exit 2
 	fi
-	if [ ! -f "$workingDir/restartOK" ]; then
-		echo "[ERROR] The work directory $workingDir does not support restart, exiting"
+	if [ ! -f ${workingDir}/restartOK ]; then
+		echo "[ERROR] The work directory ${workingDir} does not support restart, exiting"
 		exit 2
 	fi;
-	echo "\nRestarting interrupted download using work directory $workingDir\n"
+	echo "\nRestarting interrupted download using work directory ${workingDir}\n"
 
 	#---------------
 	#
@@ -640,11 +659,11 @@ else
 	# label
 	#---------------
 	
-	extDir=$workingDir/ESD_ISO
-	isoFile="$(grep isoFile $workingDir/restartOK | cut -w -f 2)"
-	esdFile="$(grep esdFile $workingDir/restartOK | cut -w -f 2)"
-	esdURL="$(grep esdURL $workingDir/restartOK | cut -w -f 2)"
-	shaHash="$(grep shaHash $workingDir/restartOK | cut -w -f 2)"
+	extDir=${workingDir}/ESD_ISO
+	isoFile="$(grep isoFile ${workingDir}/restartOK | cut -w -f 2)"
+	esdFile="$(grep esdFile ${workingDir}/restartOK | cut -w -f 2)"
+	esdURL="$(grep esdURL ${workingDir}/restartOK | cut -w -f 2)"
+	shaHash="$(grep shaHash ${workingDir}/restartOK | cut -w -f 2)"
 	
 
 # 	isoFile=$(cat $workingDir/restartOK | awk '/isoFile/ { print $2 }')
@@ -653,10 +672,10 @@ else
 
 	if verboseOn ; then
 		echo "[DEBUG] Variables found in restart file:"
-	    echo "\tesdURL = $esdURL"
-	    echo "\tesdFile = $esdFile"
-	    echo "\tisoFile = $isoFile"
-	    echo "\tshaHash = $shaHash\n"
+	    echo "\tesdURL = ${esdURL}"
+	    echo "\tesdFile = ${esdFile}"
+	    echo "\tisoFile = ${isoFile}"
+	    echo "\tshaHash = ${shaHash}\n"
 	fi
 
 	echo "Restarting Step 2: Downloading ESD from Microsoft"
@@ -669,34 +688,34 @@ if (( retVal != 0 )); then
 	echo "              $0 -r $workingDir"
 	exit 1
 fi
-rm $workingDir/restartOK
+rm ${workingDir}/restartOK
 
 echo "\nDownload complete. Validating download (this may take a minute or so)"
-calcHash="$(shasum $esdFile | $awk '{print $1}')"
+calcHash="$(shasum ${esdFile} | $awk '{print $1}')"
 verboseOn && {
-	echo "[DEBUG] shaHash =  '$shaHash'"
-	echo "        calcHash = '$calcHash'"
+	echo "[DEBUG] shaHash =  '${shaHash}'"
+	echo "        calcHash = '${calcHash}'"
 }
-if [[ "$calcHash" != "$shaHash" ]]; then
+if [[ "${calcHash}" != "${shaHash}" ]]; then
 	echo "[ERROR] Download validation failed"
-	echo "        Expected hash = $shaHash"
-	echo "        Calculated hash = $calcHash"
+	echo "        Expected hash = ${shaHash}"
+	echo "        Calculated hash = ${calcHash}"
 	echo "Re-run $0 - if this error persists, please post a message on the VMware Fusion forum.\n"
 	echo "Work directory $workingDir was not deleted, use for debugging"
 	exit 1
 else
 	echo "Download validated."
-	verboseOn && wimlib-imagex info $esdFile
+	verboseOn && wimlib-imagex info ${esdFile}
 fi
 
 echo "\nStep 2 complete - ESD downloaded"	
 
 echo "\nStep 3: Building installation image from ESD distribution"
-extractEsd $esdFile $extDir
+extractEsd ${esdFile} ${extDir}
 retVal=$?
 if (( retVal != 0 )); then
-	echo "[ERROR] Installation image build failed with error code $retVal"
-	echo "Work directory $workingDir was not deleted, use for debugging"
+	echo "[ERROR] Installation image build failed with error code ${retVal}"
+	echo "Work directory ${workingDir} was not deleted, use for debugging"
 	exit 1
 fi
 
@@ -709,7 +728,7 @@ fi
 if [[ "x${keepDownloads}" == "x" ]]; then
 	echo \n"ESD added successfully to installation image and is no longer needed.\nDeleting it to save disk space."
 	verboseOn && echo "Deleting ESD file ${esdFile}"
-	rm -rf ${esdFile} 
+	rm -rf ${esdFile}
 	retVal=$?
 	if (( retVal != 0 )); then
 		echo "[WARNING] Deletion of ESD file encountered a problem."
@@ -725,18 +744,18 @@ echo "\nStep 3 complete - installation image built"
 	
 echo "\nStep 4: Creating ISO $isoFile from the installation image\n"
 
-buildIso $extDir $isoFile
+buildIso ${extDir} ${isoFile}
 retVal=$?
 if (( retVal != 0 )); then
 	echo "[ERROR] ISO was NOT created"
-    echo "Working directory $workingDir was not deleted, use for debugging"
+    echo "Working directory ${workingDir} was not deleted, use for debugging"
     exit 1
 fi
 
 echo "Step 4 complete - ISO created"
 if [[ "x${keepDownloads}" == "x" ]]; then
 	echo "\nCleaning up work directory"
-	rm -rf $workingDir
+	rm -rf ${workingDir}
 else
 	echo "[DEBUG] keepDownloads is set - Work directory $workingDir is still available for debugging"
 fi
