@@ -3,7 +3,7 @@
 # NAME
 w11arm_esd2iso - a utility to build Windows 11 ARM instalatin ISOs from Microsoft ESD files
 
-# SUMMARY
+## SUMMARY
 
 This utility creates ISO installation media for Windows 11 ARM from 
 ESD files in Microsoft's software distribution infrastructure.
@@ -20,12 +20,12 @@ CHANGES IN V5.0
 		
 See the CHANGELOG document for changes made in prior versions.
 
-# SYNOPSIS
+## SYNOPSIS
 **w11arm_esd2iso** [-v]\
 **w11arm_esd2iso** [-v] -r *work-dir*\
 **w11arm_esd2iso** [-Vh]
 
-# DESCRIPTION
+## DESCRIPTION
 In the first form, a Windows 11 ARM 22H2 ESD (Electronic 
 Software Distribution) file is downloaded from Microsoft,
 and converted to ISO.
@@ -45,7 +45,7 @@ and is expected to be a work directory created from a prior failed run of the ut
 In the third form, the utility will either print out it's version or a synopsis of 
 command line options, and immediately exit without performing any ISO build.
 	
-# OPTIONS
+## OPTIONS
 
 **-h**		
 : Print a synopsis of usage and exit
@@ -61,13 +61,13 @@ command line options, and immediately exit without performing any ISO build.
 : Print the version of the utility and exit.
 
 
-# FILES
+## FILES
 ./esd2iso_work.*	
 : Work directory for ESD download and image creation, located in the current 
 working directory.
 
 
-# DEPENDENCIES
+## DEPENDENCIES
 w11arm_esd2iso should run on any reasonably current macOS or Linux systems. It should 
 run on Intel or arm64 architecture systems.
 
@@ -85,14 +85,14 @@ the remaining required packages.
 For Linux, most of the utilities should be availabe from your distribution's package manager.
 Install them if not already installed. 
 
-# EXIT VALUES
+## EXIT VALUES
 **0**
 : Successful creation of the ISO file
 
 **Non-zero** 
 : Unsuccessful creation of the ISO file
 	
-# NOTES
+## NOTES
 
 w11arm_esd2iso only builds ISO media for Windows 11 ARM 22H2. It does not build media 
 for any other versions of Windows or Windows Server.
@@ -122,14 +122,14 @@ w11arm_esd2iso will verify the SHA1 hash of the downloaded ESD file against the 
 provided by Microsoft. If the verification fails (indicating a corrupt
 download), the utility will exit with an error message.
 
-# CREDITS
+## CREDITS
 Information for obtaining Microsoft ESD distributions and
 Microsoft Product catalog from b0gdanw "ESD to ISO on macOS.txt" 
 https://gist.github.com/b0gdanw/e36ea84828dbd19e03eff6158f1fc77c
 
 
 
-LEGAL
+## LEGAL
 
 w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell
 
