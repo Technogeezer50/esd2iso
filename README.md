@@ -83,7 +83,8 @@ For macOS, xpath and shasum are already installed. Use Homebrew or MacPorts to i
 the remaining required packages.
 
 For Linux, most of the utilities should be availabe from your distribution's package manager.
-Install them if not already installed. 
+Install them if not already installed. If you don't know which packages contain the utility, many
+distros will give you a hint if you simply type the command with no arguments. 
 
 ## EXIT VALUES
 **0**
