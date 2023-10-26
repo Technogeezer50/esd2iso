@@ -1,5 +1,13 @@
 CHANGELOG
 
+Version 5.0 (2023-10-27)
+
+	Generic version. Will run on both macOS (Darwin) and many Linux distos. Almost all Mac specific
+	things have been removed
+
+	Unlike the Mac-specific download formerly available on the VMwrae Fusion site, this version
+	requires the user to install some utilities on boht Linux and Mac systems. 
+
 Version 4.0.4 (2023-10-05)
 
 	Bug fix: Failure to restart interrupted downloads using the -r option. Let's just say a pretty 
