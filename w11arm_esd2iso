@@ -23,21 +23,20 @@
 #
 
 
-versionID="5.0 (2023-10-05)"
-version="w11arm_esd2iso ${versionID}\n"
-verbosityLevel=0
-bOption=0
-hOption=0
-rOption=0
-minDiskSpace=12
-shaHash=""
-
+readonly versionID="5.0 (2023-10-05)"
+readonly version="w11arm_esd2iso ${versionID}\n"
+readonly minDiskSpace=12
+readonly requires="wimlib-imagex aria2c cabextract mkisofs xpath shasum"
 declare -a lTags
 declare -a lDesc
-
-
-requires="wimlib-imagex aria2c cabextract mkisofs xpath shasum"
-# requiredLibs="libcrypto libgmp libgmpxx libiconv libicudata libicui18n libicuio libicutest libicutu libicuuc libintl liblzma libuv libwim libxml2 libz"
+declare esdURL
+declare esdFile
+declare buildName
+declare verbosityLevel=0
+declare bOption=0
+declare hOption=0
+declare rOption=0
+declare shaHash=""
 
 usage() {
   echo -e "Usage:\n"
@@ -50,36 +49,28 @@ usage() {
   echo -e "\t-V\tPrint program version and exit"
   echo -e "\t-r work-dir\n\t\tRestart an interrupted ESD download from a prior execution using work-dir"
   echo
-  echo -e "See the w11arm_esd2iso_manpage.pdf document for complete documentation\n"
 }
-printVersion() {
-	echo -e $version
-}
+
 verboseOn() {
-	if (( verbosityLevel == 0 )); then
-		return 1
-	else
-		return 0
-	fi
+	return $(( verbosityLevel == 0 ))
 }
 
 printLanguages() {
-	local i=1
+	local i
 	
 	printf '%s\n\n' "Available Windows 11 ARM languages are:"
 	printf '%-20s %-30s\n' "Language tag"	"Language"
 	printf '%-20s %-30s\n'  "------------" "--------------------"
-    while (( i <= ${#lTags[@]} )); do
+    for (( i=1; i<=${#lTags[@]}; i++ )); do
     	printf '%-20s %-30s\n' ${lTags[$i]} "${lDesc[$i]}"
-		let i++
     done
     return 0
 }
 downloadCatalog() {
-	local wDir=$1
-	local retVal
-	local edQuery
-	local editionName=$2
+	local -r wDir=$1
+	local -r editionName=$2
+	local -r edQuery='//File[Architecture="ARM64"][Edition="'${editionName}'"]'
+	
 	local ltg
 	
 	if [ ! -d ${wDir} ]; then
@@ -95,26 +86,20 @@ downloadCatalog() {
 	
 	
 	echo -e "\nPlease wait while information is being downloaded from Microsoft for the $editionName ESDs"
-	
-	aria2c --dir="${wDir}" --out=catalog.cab --download-result=hide "https://go.microsoft.com/fwlink?linkid=2156292"
-	# curl -L "https://go.microsoft.com/fwlink?linkid=2156292" $showMeter -o $wDir/catalog.cab
-    retVal=$?
-	(( retVal != 0 )) && return ${retVal}
+	aria2c --dir="${wDir}" --out=catalog.cab --download-result=hide "https://go.microsoft.com/fwlink?linkid=2156292" || return $?
 
 	(
 		cd ${wDir}; 
 		cabextract catalog.cab; 
 		sed -i.bak 's/\r//' products.xml 
 	)
-
 	
 	#
 	# Get only the W11 Pro ARM64 products
 	#
-	echo -e '<Catalog>' > ${wDir}/w11arm_products.xml
-	edQuery='//File[Architecture="ARM64"][Edition="'${editionName}'"]'
-	xpath -q -n -e ${edQuery} ${wDir}/products.xml >> ${wDir}/w11arm_products.xml
 	
+	echo -e '<Catalog>' > ${wDir}/w11arm_products.xml
+	xpath -q -n -e ${edQuery} ${wDir}/products.xml >> ${wDir}/w11arm_products.xml	
 	echo -e '</Catalog>'>> ${wDir}/w11arm_products.xml
 
 	#
@@ -125,12 +110,13 @@ downloadCatalog() {
     	lTags+=("${ltg}")
     	lDesc+=("$(xpath -q -n -e '//File[LanguageCode="'$ltg'"]/Language' ${workingDir}/w11arm_products.xml | sed -E -e s/'(<Language>)|(<\/Language>)'//g )")
     done
+    
 	echo -e "Processing complete"
 	return 0
 }
 
 setupEsdDownload(){
-
+	
 	#---------------
 	# Find the desired language variant file 
 	#
@@ -157,7 +143,6 @@ setupEsdDownload(){
 	fi
 
 	echo -e "Selected language of the ISO is ${esdLang}"
-	# xpath -n -q -e '//Language' $workingDir/esd_edition.xml | sed -E -e s/'(<Language>)|(<\/Language>)'//g
 	verboseOn && echo -e "[DEBUG] The ESD will be downloaded from\n$esdURL"
 	echo -e "The generated ISO will be ${isoFile}"
 	
@@ -180,12 +165,11 @@ setupEsdDownload(){
 downloadEsd() {
 
 	local retVal
-	local retryCount
-	local retryLimit
+	local -r retryLimit=20
 	local displayInterval
 	local calculatedHash
+	local retryCount
 	
-	retryLimit=20
 	retryCount=0
 
 	#
@@ -194,14 +178,13 @@ downloadEsd() {
 	echo
 	displayInterval=0
 	verboseOn && displayInterval=120
-	retVal=1
 	while (( retryCount < retryLimit ))
 	do
 		let retryCount+=1
+		retVal=0
 		echo -e "ESD Download attempt $retryCount"
-		aria2c --summary-interval=${displayInterval} --dir="${workingDir}" --file-allocation=none "${esdURL}"
+		aria2c --summary-interval=${displayInterval} --dir="${workingDir}" --file-allocation=none "${esdURL}" && break
 		retVal=$?
-		(( retVal == 0 )) && break;
 		echo -e "Download interrupted, \c"
 		if (( retryCount < retryLimit )); then
 			echo -e "retrying"
@@ -214,26 +197,24 @@ downloadEsd() {
 
 extractEsd(){	
 	
-	local eFile
-	local eDir
+	local -r eFile=$1
+	local -r eDir=$2
+	local images=(4 5)
+	local beQuiet="--quiet"
 	local retVal
 	local esdImageCount
-	local bootWimFile
-	local installWimFile
-	local images
+	local bootWimFile=${eDir}/sources/boot.wim
+	local installWimFile=${eDir}/sources/install.wim
+
 	local imageIndex
 	local imageEdition
-	local beQuiet
-	
-	eFile=$1
-	eDir=$2
-	beQuiet="--quiet"
-	bootWimFile=${eDir}/sources/boot.wim
-	installWimFile=${eDir}/sources/install.wim
-	images=(4 5)
 	
 	verboseOn && beQuiet=""
 	
+	#---------------
+	# Check the number of images in the esd. If 6, add it to the list of images in $images
+	#---------------
+		
 	esdImageCount=$(wimlib-imagex info ${eFile} | awk '/Image Count:/ {print $3}')
 	verboseOn && echo -e "[DEBUG] image count in ESD: $esdImageCount"
 	(( esdImageCount == 6 )) && images+=(6)
@@ -243,12 +224,11 @@ extractEsd(){
 	#---------------
 
 	echo -e "\nApplying boot files to the image"
-	wimlib-imagex apply $eFile 1 ${eDir} $beQuiet 2>/dev/null
-	retVal=$?
-	if (( retVal != 0 )); then
+	wimlib-imagex apply $eFile 1 ${eDir} $beQuiet 2>/dev/null || {
+		retVal=$?
 		echo -e "[ERROR] Extract of boot files failed"
 		return $retVal
-	fi
+	}
 
 	echo -e "Boot files successfully applied to image"
 
@@ -261,19 +241,17 @@ extractEsd(){
 	#---------------
 
 	echo -e "\nAdding WinPE and Windows Setup to the image"
-	wimlib-imagex export ${eFile} 2 ${bootWimFile} --compress=LZX --chunk-size 32K ${beQuiet}
-	retVal=$?
-	if (( retVal != 0 )); then
+	wimlib-imagex export ${eFile} 2 ${bootWimFile} --compress=LZX --chunk-size 32K ${beQuiet} || {
+		retVal=$?
 		echo -e "[ERROR] Add of WinPE failed"
-		return $retVal
-	fi
-
-	wimlib-imagex export ${eFile} 3 $bootWimFile --compress=LZX --chunk-size 32K --boot ${beQuiet}
-	retVal=$?
-	if (( retVal != 0 )); then
+		return ${retVal}
+	}
+	
+	wimlib-imagex export ${eFile} 3 $bootWimFile --compress=LZX --chunk-size 32K --boot ${beQuiet} || {
+		retVal=$?
 		echo -e "[ERROR] Add of Windows Setup failed"
-		return $retVal
-	fi
+		return ${retVal}
+	}
 	echo -e "WinPE and Windows Setup added successfully to image\n"
 	
 	verboseOn && {
@@ -290,14 +268,12 @@ extractEsd(){
 	for imageIndex in ${images[*]}; do
 		imageEdition="$(wimlib-imagex info ${eFile} ${imageIndex} | grep '^Description:' | sed 's/Description:[ \t]*//')"
 		echo -e "\nAdding $imageEdition to the image"
-		wimlib-imagex export ${eFile} ${imageIndex} ${installWimFile} --compress=LZMS --chunk-size 128K ${beQuiet}
-		retVal=$?
-		if (( retVal != 0 )); then
+		wimlib-imagex export ${eFile} ${imageIndex} ${installWimFile} --compress=LZMS --chunk-size 128K ${beQuiet} || {
+			retVal=$?
 			echo -e "[ERROR] Addition of ${imageIndex} to the image failed"
 			return $retVal
-		fi
+		}
 		echo -e "${imageEdition} added successfully to the image"
-
 	done
 
 	echo -e "\nAll Windows editions added to image"	
@@ -311,20 +287,18 @@ extractEsd(){
 }
 
 buildIso(){
-	local iDir=$1
-	local iFile=$2
-	local bootFile="efi/microsoft/boot/efisys.bin"
-	local $retVal
+	local -r iDir=$1
+	local -r iFile=$2
+	local -r bootFile="efi/microsoft/boot/efisys.bin"
 	
 	if [ -e ${iFile} ]; then
 	  echo -e "\t[INFO] File ${iFile} exists, removing it"
 	  rm -rf ${iFile}
 	fi
 
-	mkisofs -b ${bootFile} --no-emul-boot --udf -iso-level 3 --hide "*" -V "ESD_ISO" -o ${iFile} $iDir
-	retVal=$?   
+	mkisofs -b ${bootFile} --no-emul-boot --udf -iso-level 3 --hide "*" -V "ESD_ISO" -o ${iFile} $iDir 
 	
-	return $retVal
+	return $?
 }
 
 
@@ -368,7 +342,7 @@ while getopts ":hr:vV" opt; do
     	let verbosityLevel+=1
     	;;
 	V)
-    	printVersion
+    	echo -e $version
     	exit 1
     	;;
     :)
@@ -385,9 +359,6 @@ while getopts ":hr:vV" opt; do
     esac
 done
 shift "$((OPTIND-1))"
-
-
-printVersion
 
 
 #-------------------
