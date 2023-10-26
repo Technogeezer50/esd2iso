@@ -9,7 +9,7 @@ The resulting ISO can be used to install Windows 11 ARM virtual machines on any
 virtualization solution that supports arm64 architectures such as VMware Fusion on
 Apple Silicon Macs. 
 
-CHANGES IN V5.0
+## Changes in version 5.0
 
 First version to be uploaded to its new home on GitHub:
 		https://github.com/Technogeezer50/esd2iso
@@ -61,8 +61,8 @@ command line options, and immediately exit without performing any ISO build.
 
 ## Files
 ./esd2iso_work.xxxxxx	
-: Work directory for ESD download and image creation, located in the current 
-working directory.
+: Work directory for ESD download and image creation, created in the current 
+working directory. The directory contains the downloaded ESD file and other files used during creation of the ISO. It will be deleted upon successful creation of the ISO.
 
 
 ## Dependencies
