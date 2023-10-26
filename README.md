@@ -1,9 +1,7 @@
-
-
-# NAME
+# Name
 w11arm_esd2iso - a utility to build Windows 11 ARM instalatin ISOs from Microsoft ESD files
 
-## SUMMARY
+## Summary
 
 This utility creates ISO installation media for Windows 11 ARM from 
 ESD files in Microsoft's software distribution infrastructure.
@@ -13,19 +11,19 @@ Apple Silicon Macs.
 
 CHANGES IN V5.0
 
-	First version to be uploaded to its new home on GitHub:
+First version to be uploaded to its new home on GitHub:
 		https://github.com/Technogeezer50/esd2iso
 	
-	This version now runs on Linux distributions.
+This version now runs on Linux distributions.
 		
 See the CHANGELOG document for changes made in prior versions.
 
-## SYNOPSIS
+## Command Syntax
 **w11arm_esd2iso** [-v]\
 **w11arm_esd2iso** [-v] -r *work-dir*\
 **w11arm_esd2iso** [-Vh]
 
-## DESCRIPTION
+## Description
 In the first form, a Windows 11 ARM 22H2 ESD (Electronic 
 Software Distribution) file is downloaded from Microsoft,
 and converted to ISO.
@@ -45,7 +43,7 @@ and is expected to be a work directory created from a prior failed run of the ut
 In the third form, the utility will either print out it's version or a synopsis of 
 command line options, and immediately exit without performing any ISO build.
 	
-## OPTIONS
+## Command optinos
 
 **-h**		
 : Print a synopsis of usage and exit
@@ -61,17 +59,17 @@ command line options, and immediately exit without performing any ISO build.
 : Print the version of the utility and exit.
 
 
-## FILES
-./esd2iso_work.*	
+## Files
+./esd2iso_work.xxxxxx	
 : Work directory for ESD download and image creation, located in the current 
 working directory.
 
 
-## DEPENDENCIES
-w11arm_esd2iso should run on any reasonably current macOS or Linux systems. It should 
+## Dependencies
+w11arm_esd2iso is written using the BASH shell, and should run on any reasonably current macOS or Linux systems. It should 
 run on Intel or arm64 architecture systems.
 
-w11arm_esd2iso requires the following open source utilities.
+w11arm_esd2iso requires the followng utilities in order to create the ISO from the Microsoft ESD file:
 * wimlib-imagex
 * cabextract
 * aria2c
@@ -79,21 +77,34 @@ w11arm_esd2iso requires the following open source utilities.
 * mkisofs
 * shasum
 
-For macOS, xpath and shasum are already installed. Use Homebrew or MacPorts to install 
-the remaining required packages.
+> [!IMPORTANT]
+> Mac users beware. Unlike the versions that used to be found on the VMware VMTN site, w11arm_esd2iso does not bundle any of these utilities.
 
-For Linux, most of the utilities should be availabe from your distribution's package manager.
-Install them if not already installed. If you don't know which packages contain the utility, many
+### Mac Users
+macOS already installs both xpath and shasum. The remaning packages will need to be installed from Homebrew or MacPorts.
+
+For Homebrew:
+```
+brew install wimlib cabextract aria2 cdrtools
+```
+For MacPorts:
+```
+sudo port install wimlib cabextract aria2 cdrtools
+```
+### Linux users
+
+For Linux, most of the utilities should be available in your distribution's repos.
+Install them using your package manager if not already installed. 
+
+The exact packages to install may vary between distros. If you don't know which packages contain the utility, many
 distros will give you a hint if you simply type the command with no arguments. 
 
-## EXIT VALUES
-**0**
-: Successful creation of the ISO file
+## Return codes
+**0**	: Successful creation of the ISO file
 
-**Non-zero** 
-: Unsuccessful creation of the ISO file
+**Non-zero** 	: Unsuccessful creation of the ISO file
 	
-## NOTES
+## Other Notes
 
 w11arm_esd2iso only builds ISO media for Windows 11 ARM 22H2. It does not build media 
 for any other versions of Windows or Windows Server.
@@ -123,14 +134,12 @@ w11arm_esd2iso will verify the SHA1 hash of the downloaded ESD file against the 
 provided by Microsoft. If the verification fails (indicating a corrupt
 download), the utility will exit with an error message.
 
-## CREDITS
+## Credits
 Information for obtaining Microsoft ESD distributions and
 Microsoft Product catalog from b0gdanw "ESD to ISO on macOS.txt" 
 https://gist.github.com/b0gdanw/e36ea84828dbd19e03eff6158f1fc77c
 
-
-
-## LEGAL
+## Legalese
 
 w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell
 
