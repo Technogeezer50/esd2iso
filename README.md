@@ -43,7 +43,7 @@ and is expected to be a work directory created from a prior failed run of the ut
 In the third form, the utility will either print out it's version or a synopsis of 
 command line options, and immediately exit without performing any ISO build.
 	
-## Command optinos
+## Command options
 
 **-h**		
 : Print a synopsis of usage and exit
@@ -70,24 +70,25 @@ w11arm_esd2iso is written using the BASH shell, and should run on any reasonably
 run on Intel or arm64 architecture systems.
 
 w11arm_esd2iso requires the followng utilities in order to create the ISO from the Microsoft ESD file:
+* xpath
+* shasum
 * wimlib-imagex
 * cabextract
 * aria2c
-* xpath
 * mkisofs
-* shasum
 
 > [!IMPORTANT]
-> Mac users beware. Unlike the versions that used to be found on the VMware VMTN site, w11arm_esd2iso does not bundle any of these utilities.
+> Mac users beware. Unlike the versions found on the VMware Fusion Documents site, w11arm_esd2iso does not bundle any of these utilities. You'll need to install them yourself.
 
 ### Mac Users
-macOS already installs both xpath and shasum. The remaning packages will need to be installed from Homebrew or MacPorts.
+macOS already includes both xpath and shasum. The remaning packages will need to be installed from Homebrew or MacPorts (or compile them yourself from their sources if you are 
+so inclined).
 
-For Homebrew:
+To install from Homebrew:
 ```
 brew install wimlib cabextract aria2 cdrtools
 ```
-For MacPorts:
+To install from MacPorts:
 ```
 sudo port install wimlib cabextract aria2 cdrtools
 ```
@@ -107,7 +108,7 @@ distros will give you a hint if you simply type the command with no arguments.
 ## Other Notes
 
 w11arm_esd2iso only builds ISO media for Windows 11 ARM 22H2. It does not build media 
-for any other versions of Windows or Windows Server.
+for any other version of Windows or Windows Server.
 
 Have at least 12 GB of free disk space to run w11arm_esd2iso. Checks are performed for
 sufficient disk space and the utility will refuse to run if space isn't available.
@@ -118,19 +119,18 @@ errors are encountered. It will not be deleted if a transfer of the ESD can be
 restarted using the -r option, or if the final phase of the ESD creation
 fails.  
 
-w11arm_esd2iso automatically enables retry and restart features that handle the interruption 
-of ESD downloads from Microsoft due to network connectivity issues.  The 
-utility will automatically retry an interrupted download up to 20 times. After 20 retries,
+If downloads are interrupted due to network issues, the 
+utility will automatically retry the download from the point of interruption up to 10 times. After 10 retries,
 the utility will exit, and will display a command (containing the -r option) that can be 
 copy/pasted to resume the ESD download. 
 
-The -r option can be used as many times as necessary as directed by the utility to 
-complete the download. In all honesty, it shouldn't need to be used more than 
+An interrupted download can be restarted with the  -r option as many times as necessary 
+as long as the work directory still exists. In all honesty, it shouldn't need to be used more than 
 once unless you have a really, really bad network connection. Each restart attempt
-using the -r option will resume a download from the point of interruption of the
+using the -r option will also resume a download from the point of interruption of the
 last execution of the utility. 
 
-w11arm_esd2iso will verify the SHA1 hash of the downloaded ESD file against the hash value
+The downloaded ESD file will be validated against the SHA1 hash 
 provided by Microsoft. If the verification fails (indicating a corrupt
 download), the utility will exit with an error message.
 
