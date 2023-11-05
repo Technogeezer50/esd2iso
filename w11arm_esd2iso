@@ -419,12 +419,10 @@ while getopts ":hr:vVd" opt; do
     d)
     	dOption=1
     	let verbosityLevel+=1
-    	echo -e "[DEBUG] Debug mode enabled"
     	;;
     	
 	v)
     	let verbosityLevel+=1
-    	echo -e $version
     	;;
 	V)
     	echo -e $version
@@ -458,6 +456,8 @@ if (( $# > 0 )); then
 	exit 1
 fi
 
+verboseOn && echo -e ${version}
+debugOn && echo -e "[DEBUG] Debug mode enabled"
 
 #-------------------
 # Check if required utilities are installed

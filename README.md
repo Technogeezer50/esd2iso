@@ -1,5 +1,5 @@
 # Name
-w11arm_esd2iso - a utility to build Windows 11 ARM instalatin ISOs from Microsoft ESD files
+w11arm_esd2iso - a utility to build Windows 11 ARM installation ISOs from Microsoft ESD files
 
 ## Summary
 
