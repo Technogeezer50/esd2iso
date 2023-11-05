@@ -1,6 +1,6 @@
 CHANGELOG
 
-Version 5.0 (2023-10-27)
+Version 5.0.0 (20231104)
 
 	Generic version. Will run on both macOS (Darwin) and many Linux distos. Almost all Mac specific
 	things have been removed

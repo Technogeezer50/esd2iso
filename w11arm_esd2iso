@@ -23,7 +23,7 @@
 #
 
 
-readonly versionID="5.0 (2023-10-27)"
+readonly versionID="5.0.0a (20231104)"
 readonly version="w11arm_esd2iso ${versionID}\n"
 readonly minDiskSpace=12
 readonly requires="wimlib-imagex aria2c cabextract mkisofs xpath shasum"
@@ -84,11 +84,11 @@ debugOn() {
 printLanguages() {
 	local i
 	
-	printf '%s\n\n' "Available Windows 11 ARM languages are:"
-	printf '%-20s %-30s\n' "Language tag"	"Language"
-	printf '%-20s %-30s\n'  "------------" "--------------------"
+	printf '\n%s\n\n' "Available Windows 11 ARM languages are:"
+	printf '%-15s %-20s\n' "Language tag"	"Language"
+	printf '%-15s %-20s\n' "------------" "--------------------"
     for (( i=1; i<=${#lTags[@]}; i++ )); do
-    	printf '%-20s %-30s\n' ${lTags[$i]} "${lDesc[$i]}"
+    	printf '%-15s %-20s\n' ${lTags[$i]} "${lDesc[$i]}"
     done
     return 0
 }
@@ -122,6 +122,7 @@ setupEsdDownload(){
 	local answer
 	local pDesc
 	local ltg
+	local found
    
     #
 	# Ask the user for the ISO edition
@@ -132,9 +133,9 @@ setupEsdDownload(){
 	while [[ -z ${editionName} ]]; do
 
 		echo -e "Enter 'p' to create a Professional Edition ISO"
-		echo -e "                      (includes Professional and Home Editions)"
+		echo -e "          (includes Professional and Home Editions), or"
 		echo -e "      'e' to create a Enterprise Edition ISO"
-		echo -e "                      (includes Professional and Enterprise Editions)"
+		echo -e "          (includes Professional and Enterprise Editions), or"
 		echo -e "      'q' to exit the program without creating an ISO: \c"
 		read answer
 
@@ -178,36 +179,39 @@ setupEsdDownload(){
 	# Ask the user for the ISO language they want 
 	#
 	
-	echo -e "\n\nPlease select a language for your Windows 11 ARM ${editionName} ISO\n"
-	printLanguages
+	echo -e "\n\nPlease select a language for your Windows 11 ARM ${editionName} ISO"
+# 
 	esdLang=""
 	while [[ -z ${esdLang} ]]; do
-		echo -e "\nEnter a language tag from the 'Language Tag' colummn of the list, or"
-		echo -e "'list' to reprint the list of languages, or"
-		echo -e "'quit' to exit the program without creating an ISO: \c"
+		echo -e "Enter a Windows language tag (example: 'en-us'), or"
+		echo -e "     'p' to print the list of available languages, or"
+		echo -e "     'q' to exit the program without creating an ISO: \c"
 		read answer
 
-		if [[ ${answer} == "quit" ]]; then
-			return 1
-		fi
-		if [[ ${answer} == "list" ]]; then
-			printLanguages
-			continue
-		fi
-		
-		found=0
-	    for i in ${lTags[*]}; do
-			if [[ ${answer} == $i ]]; then 
-				found=1; 
-				break
-			fi;
-		done
+		case ${answer} in
+			p | P )
+				printLanguages
+				continue
+				;;
+			q | Q )
+				return 1
+				;;
+			* )
+				found=0
+				for i in ${lTags[*]}; do
+					if [[ ${answer} == $i ]]; then 
+						found=1; 
+						break
+					fi;
+				done
 
-		if (( found == 0 )); then
-		  echo -e "${answer} is not a valid language tag. Please try again"
-		else
-		  esdLang=${answer}
-		fi
+				if (( found == 0 )); then
+				  echo -e "${answer} is not a valid language tag. Please try again"
+				else
+				  esdLang=${answer}
+				fi
+				;;
+		esac
 	done
 
 	xpath -q -n -e '//File[LanguageCode="'${esdLang}'"]' "${wDir}/w11arm_products.xml" >"${wDir}/esd_edition.xml"
