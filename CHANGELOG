@@ -1,9 +1,11 @@
 CHANGELOG
 
-Version 5.0.0 (20231104)
+v5.0.0 (20231104)
 
 	Generic version. Will run on both macOS (Darwin) and many Linux distos. Almost all Mac specific
 	things have been removed
+	
+	First version to be posted to GitHub. No longer available on VMware Fusion Documents site.
 
 	Unlike the Mac-specific download formerly available on the VMwrae Fusion site, this version
 	requires the user to install some utilities on both Linux and Mac systems. 
