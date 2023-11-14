@@ -9,7 +9,7 @@ w11arm_esd2iso | 5.0.1 build 20231104
 * Re-working of README.md file. 
 * Move of the how-to-use documentation into file USAGE.txt.
 
-## What's changed in 5.0.0
+### What's changed in 5.0.0
 
 * Generic version. Will run on both macOS (Darwin) and many Linux distos. Almost all Mac specific
 things have been removed
