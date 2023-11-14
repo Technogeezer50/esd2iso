@@ -23,17 +23,15 @@ comfortable with this, it's recommended to use other more "novice friendly" mech
 obtain Windows 11 ARM installation media 
 (such as Parallels' and VMware Fusion's built-in tools, or the open source CrystalFetch).
 
-## How is this different than the versions that used to be found on the VMware 
-Fusion Documents forum?
+## How is this different than the versions that used to be found on the VMware Fusion Documents forum?
 
 This project was created by the original author of the w11arm_esd2iso utility
-as a continuation of versions that
-were previously found on the VMware sites. It is compatible in operation with
+as a continuation of the project formerly found on the VMware Fusion Documents forum. It is compatible in operation with
 the final version that resided on the VMware sites.
 
-[!NOTE]
->> w11arm_esd2iso was removed from the VMware Fusion Documents site as of
->> 2023-11-15. This is the only place to find it!_
+> [!Note]
+> w11arm_esd2iso was removed from the VMware Fusion Documents site as of
+> 2023-11-15. This is now the official home of the project.
 
 The major differences between this project and the versions available on the VMware sites
 are:
@@ -70,20 +68,20 @@ allows it to run on:
 * Move the file w11arm_esd2iso to the location of your choice.
 * Change permissions on w11arm_esd2iso to make it executable (it does not require
 root permissions).
-* Install all required utilities as noted in DOCUMENTATION.txt.
+* Install all required utilities as noted in USAGE.txt.
 
 ## How do I use w11arm_esd2iso?
 
-See the file DOCUMENTATION.txt that's included with the download.
+See the file USAGE.txt that's included with the download.
 
 # Licensing
 
-w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell
+w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell and licensed under the terms of 
+the GNU General Public License version 2.
 
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License version 2 for more details.
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 
 See the files COPYING and COPYING.GPLv2 for all the gory details.
 
@@ -91,7 +89,7 @@ See the files COPYING and COPYING.GPLv2 for all the gory details.
 
 ## What if I find a bug or need help?
 
-Bug reporting is something that I'm in the process of figuring out.
+Bug reporting is something that I'm in the process of figuring out how to handle. Stay tuned.
 
 The utility is written as a bash shell script. If you're fluent in bash shell programming
 you can probably find out what's going wrong. 
