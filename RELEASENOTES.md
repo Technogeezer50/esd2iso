@@ -2,6 +2,8 @@
 
 w11arm_esd2iso | 5.0.2 build 20231125
 
+v5.0.2 is a bug-fix release to w11arm_esd2iso v5.0.
+
 ## What's changed?
 
 ### What's changed in 5.0.2
