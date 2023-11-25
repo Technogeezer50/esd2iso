@@ -1,5 +1,16 @@
 CHANGELOG
 
+v5.0.2 (20231125)
+
+	Issue #1: Fix errors in builds of Win 11 23H2 ISOs when running with a Debian-derived mkisofs
+	(non-Jorg "Schily" Schilling fork).  Add -allow-limited-size argument for these versions
+	that allows the creation of the ISO when install.wim exceeds 4GB in size.
+	
+	A delay was present after the user selected the Enterprise or Professional ISO type while
+	the available languages for that edition were being determined. That could be 
+	interpreted by the user as a "hang" in the program. Feedback was added to let the user know that
+	an operation was in progress and not hung. 
+	
 v5.0.0 (20231104)
 
 	Generic version. Will run on both macOS (Darwin) and many Linux distos. Almost all Mac specific

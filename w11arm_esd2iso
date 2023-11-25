@@ -23,7 +23,7 @@
 #
 
 
-readonly versionID="v5.0.1 (20231115)"
+readonly versionID="v5.0.2 (20231124)"
 readonly version="w11arm_esd2iso ${versionID}\n"
 readonly minDiskSpace=12
 readonly requires="wimlib-imagex aria2c cabextract mkisofs xpath shasum"
