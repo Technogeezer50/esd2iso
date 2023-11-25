@@ -155,16 +155,17 @@ setupEsdDownload(){
 		esac
 	done
 
-    
+    echo -e "\nDetermining available languages for ${editionName} edition.\c"
     #
 	# Get the W11 ARM64 products for the desired edition from the catalog
 	#
 	
     edQuery='//File[Architecture="ARM64"][Edition="'${editionName}'"]'
 	echo -e '<Catalog>' > "${wDir}/w11arm_products.xml"
+	echo -e ".\c"
 	xpath -q -n -e ${edQuery} "${wDir}/products.xml" >> "${wDir}/w11arm_products.xml"
 	echo -e '</Catalog>'>> "${wDir}/w11arm_products.xml"
-
+	echo -e ".\c"
 	#
 	# Load the available languages so the user can select one
 	# 
@@ -173,8 +174,10 @@ setupEsdDownload(){
     	lTags+=("${ltg}")
     	pDesc=$(xpath -q -n -e '//File[LanguageCode="'$ltg'"]/Language' "${wDir}/w11arm_products.xml" | sed -E -e "s/<[\/]?Language>//g" )
     	lDesc+=("$pDesc")
+    	echo -e ".\c"
     done
-
+    
+    echo -e "done."
     #
 	# Ask the user for the ISO language they want 
 	#
@@ -369,7 +372,9 @@ buildIso(){
 	local -r iDir=${extDir}
 	local -r iFile=${isoFile}
 	local -r bootFile=efi/microsoft/boot/efisys_noprompt.bin
+	local sizeArg=""
 	local beQuiet="-quiet"
+	local retVal
 	
 	verboseOn && beQuiet=""
 	
@@ -377,8 +382,26 @@ buildIso(){
 		echo -e "[INFO] File ${iFile} exists, removing it"
 		rm -rf "${iFile}"
 	fi
+	
+	# 
+	# The non-Schily mkisofs needs an additional argument to properly build
+	# Win 11 ARM 23H2 ISOs. See which mkisofs we have, and then add the -allow-limited-size
+	# argument if we have a non Schily version
+	#
+	
+	mkisofs -help 2>&1 | grep --quiet -- '-allow-limited-size'
+	retVal=$?
+	if (( retVal == 0 )) ; then
+	    #
+	    # Not Schily. Add -allow-limited-size argument
+	    #
+	    sizeArg="-allow-limited-size"
+	    debugOn && echo "[DEBUG] Not Schily mkisofs"
+	else
+		debugOn && echo '[DEBUG] Schily mkisofs'
+	fi
 
-	mkisofs ${beQuiet} -b ${bootFile} -no-emul-boot -udf -iso-level 3 -hide "*" -V "ESD_ISO" -o "${iFile}" "$iDir"
+	mkisofs ${beQuiet} -b ${bootFile} -no-emul-boot -udf ${sizeArg} -iso-level 3 -hide "*" -V "ESD_ISO" -o "${iFile}" "$iDir"
 	
 	return $?
 }
