@@ -7,19 +7,19 @@ It was born out of necessity for users of VMware Fusion on Apple Silicon Macs. T
 to easily obtain an installation ISO for Windows 11 ARM because Microsoft does not provide it
 via a public download.
 
-w11arm_esd2iso is a more efficient and reliable utility for the generation of Windows 11
-ARM installation media because:
+The benefits of w11arm_esd2iso over building ISOs from uupdump.net are:
 
-* It does not rely on uupdump (or similar) sites to build media.
-* It builds media directly from Microsoft's ESD repositories.
-* It provides release channel Windows 11 ARM media, not Insider Preview.
-* It's faster, simpler and more reliable than trying to build from uupdump.
-* It produces Windows 11 ARM 22H2 media on a Mac.
+* The ISO is built from a single file downloaded from Microsoft's ESD repositories.
+* The downloaded ESD used to build the ISO is Microsoft's latest "retail" installation media.
+* The build process uses less working disk space.
+* The build is faster from ESD vs. downloading, extracting, and stitching together multiple UUP files.
+* It's easier to select the edition and language you need.
+* No Windows system required. ISOs can be reliably built on Linux and macOS.
 
 Since this is a command line utility written in the bash shell, it's best suited for
 users that are comfortable with working in UNIX/Linux/macOS shell environments and "getting your
 hands dirty". If you aren't 
-comfortable with this, it's recommended to use other more "novice friendly" mechanisms to 
+comfortable with this, it's recommended to use "friendlier" mechanisms to 
 obtain Windows 11 ARM installation media 
 (such as Parallels' and VMware Fusion's built-in tools, or the open source CrystalFetch).
 
@@ -33,10 +33,10 @@ the final version that resided on the VMware sites.
 > w11arm_esd2iso was removed from the VMware Fusion Documents site as of
 > 2023-11-15. This is now the official home of the project.
 
-The major differences between this project and the versions available on the VMware sites
+The major differences between this project and the versions previously available on the VMware sites
 are:
  
-* This project will run on both Intel and Apple Silicon Macs with macOS 12 Monterey and later
+* This project will run on both Intel and Apple Silicon Macs.
 * This project should run on most if not all Linux distributions.
 * This project requires the user to install the open source utilities that w11arm_esd2iso uses.
 
@@ -54,9 +54,9 @@ use it to build Insider Preview, Beta, Dev, or Canary channel releases.
 
 w11arm_esd2iso is written in the bash shell, and uses open-source utilities. This
 allows it to run on:
-* macOS Monterey and later (Intel and Apple Silicon),
+* macOS 12 Monterey and later (on both Intel and Apple Silicon Macs),
 * Relatively recent versions of x64 and arm64 Linux distributions
-(tested and found to run on Fedora, Ubuntu, and Debian). 
+(It's been tested and found to run on Fedora, Ubuntu, and Debian). 
 
 
 # Installation and Use 
