@@ -6,8 +6,9 @@ v5.0.3 is a housekeeping update to w11arm_esd2iso v5.0.
 
 ## What's changed?
 
-### What's changed in 5.0.2
+### What's changed in 5.0.3
 
+* No functional changes.
 * Cleanup of files in the project relating to licensing.
 
 * Clarification of requirements for third party utilities needed on macOS.
