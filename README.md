@@ -89,7 +89,8 @@ See the files COPYING and COPYING.GPLv2 for all the gory details.
 
 ## What if I find a bug or need help?
 
-Bug reporting is something that I'm in the process of figuring out how to handle. Stay tuned.
+If you find an problem/bug with esd2iso, please open an issue. I can't guarantee when I'll
+have time to look into it, but I will review any issue that's opened.
 
 The utility is written as a bash shell script. If you're fluent in bash shell programming
 you can probably find out what's going wrong. 
