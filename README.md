@@ -89,8 +89,15 @@ See the files COPYING and COPYING.GPLv2 for all the gory details.
 
 ## What if I find a bug or need help?
 
-If you find an problem/bug with esd2iso, please open an issue. I can't guarantee when I'll
-have time to look into it, but I will review any issue that's opened.
+If you find an problem/bug with esd2iso, please open an issue. I will review any issue that's opened
+but response time is not guaranteed.
+
+If you find any issues with the utility's documentation, please open that as an issue and I'll
+correct/clarify the issue. However, I have limited bandwidth to respond to requests for 
+assistance on how to use the utility. This utility is designed for
+more advanced users are comfortable with using UNIX shells and command-line utilities. If you're not
+comfortable with that, then you may wish to consider tools like CrystalFetch (https://github.com/TuringSoftware/CrystalFetch) 
+to build your Windoww 11 ARM ISO.
 
 The utility is written as a bash shell script. If you're fluent in bash shell programming
 you can probably find out what's going wrong. 
