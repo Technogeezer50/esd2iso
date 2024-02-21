@@ -95,7 +95,7 @@ but response time is not guaranteed.
 If you find any issues with the utility's documentation, please open that as an issue and I'll
 correct/clarify the issue. However, I have limited bandwidth to respond to requests for 
 assistance on how to use the utility. This utility is designed for
-more advanced users are comfortable with using UNIX shells and command-line utilities. If you're not
+more advanced users that are comfortable with using UNIX shells and command-line utilities. If you're not
 comfortable with that, then you may wish to consider tools like CrystalFetch (https://github.com/TuringSoftware/CrystalFetch) 
 to build your Windoww 11 ARM ISO.
 
