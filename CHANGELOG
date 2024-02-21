@@ -1,5 +1,12 @@
 CHANGELOG
 
+v5.0.3 (20240221)
+
+	Strictly a housekeeping release - no functional changes.
+	Clean up licensing files found in the project.
+	Clarify documentation macOS requirements.
+	Add advice in README.md to open an issue in GitHub should a bug be found.
+
 v5.0.2 (20231125)
 
 	Issue #1: Fix errors in builds of Win 11 23H2 ISOs when running with a Debian-derived mkisofs
