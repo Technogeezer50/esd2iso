@@ -83,7 +83,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 
-See the files COPYING and COPYING.GPLv2 for all the gory details.
+See the file LICENSE for all the gory details.
 
 # Other
 
