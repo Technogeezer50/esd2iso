@@ -1,10 +1,18 @@
-# w11arm_esd2iso 5.0.2 Release Notes
+# w11arm_esd2iso 5.0.3 Release Notes
 
-w11arm_esd2iso | 5.0.2 build 20231125
+w11arm_esd2iso | 5.0.3 build 20240221
 
-v5.0.2 is a bug-fix release to w11arm_esd2iso v5.0.
+v5.0.3 is a housekeeping update to w11arm_esd2iso v5.0.
 
 ## What's changed?
+
+### What's changed in 5.0.2
+
+* Cleanup of files in the project relating to licensing.
+
+* Clarification of requirements for third party utilities needed on macOS.
+
+* Notice in README.md to open an issue in GitHub if a bug is found.
 
 ### What's changed in 5.0.2
 
