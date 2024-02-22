@@ -18,10 +18,7 @@ The benefits of w11arm_esd2iso over building ISOs from uupdump.net are:
 
 Since this is a command line utility written in the bash shell, it's best suited for
 users that are comfortable with working in UNIX/Linux/macOS shell environments and "getting your
-hands dirty". If you aren't 
-comfortable with this, it's recommended to use "friendlier" mechanisms to 
-obtain Windows 11 ARM installation media 
-(such as Parallels' and VMware Fusion's built-in tools, or the open source CrystalFetch).
+hands dirty". 
 
 ## How is this different than the versions that used to be found on the VMware Fusion Documents forum?
 
@@ -74,6 +71,14 @@ root permissions).
 
 See the file USAGE.txt that's included with the download.
 
+If you aren't comfortable with using UNIX shells 
+and command-line utilities, you may wish to look into "friendlier" mechanisms to 
+obtain Windows 11 ARM installation media. These include Parallels Desktop's and VMware Fusion's built-in tools, 
+or the open source CrystalFetch. (https://github.com/TuringSoftware/CrystalFetch).
+
+I have limited bandwidth to respond to requests for 
+help on how to use the utility.
+
 # Licensing
 
 w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell and licensed under the terms of 
@@ -87,17 +92,13 @@ See the file LICENSE for all the gory details.
 
 # Other
 
-## What if I find a bug or need help?
+## What if I find a bug?
 
 If you find an problem/bug with esd2iso, please open an issue. I will review any issue that's opened
 but response time is not guaranteed.
 
 If you find any issues with the utility's documentation, please open that as an issue and I'll
-correct/clarify the issue. However, I have limited bandwidth to respond to requests for 
-assistance on how to use the utility. This utility is designed for
-more advanced users that are comfortable with using UNIX shells and command-line utilities. If you're not
-comfortable with that, then you may wish to consider tools like CrystalFetch (https://github.com/TuringSoftware/CrystalFetch) 
-to build your Windoww 11 ARM ISO.
+correct/clarify the issue. 
 
 The utility is written as a bash shell script. If you're fluent in bash shell programming
 you can probably find out what's going wrong. 
@@ -107,5 +108,3 @@ you can probably find out what's going wrong.
 Information for obtaining Microsoft ESD distributions and
 Microsoft Product catalog from b0gdanw "ESD to ISO on macOS.txt" 
 https://gist.github.com/b0gdanw/e36ea84828dbd19e03eff6158f1fc77c
-
-
