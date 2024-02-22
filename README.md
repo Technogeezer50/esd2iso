@@ -71,13 +71,11 @@ root permissions).
 
 See the file USAGE.txt that's included with the download.
 
-If you aren't comfortable with using UNIX shells 
-and command-line utilities, you may wish to look into "friendlier" mechanisms to 
-obtain Windows 11 ARM installation media. These include Parallels Desktop's and VMware Fusion's built-in tools, 
-or the open source CrystalFetch. (https://github.com/TuringSoftware/CrystalFetch).
-
-I have limited bandwidth to respond to requests for 
-help on how to use the utility.
+> [!Note]
+> If you aren't comfortable with using UNIX shells
+> and command-line utilities, you may wish to look into "friendlier" mechanisms to
+> obtain Windows 11 ARM installation media. These include Parallels Desktop's and VMware Fusion's built-in tools,
+> or the open source CrystalFetch. (https://github.com/TuringSoftware/CrystalFetch).
 
 # Licensing
 
