@@ -92,7 +92,7 @@ See the file LICENSE for all the gory details.
 
 ## What if I find a bug?
 
-If you find an problem/bug with esd2iso, please open an issue. I will review any issue that's opened
+If you find an problem/bug with esd2iso, please open an issue at https://github.com/Technogeezer50/esd2iso/issues. I will review any issue that's opened
 but response time is not guaranteed.
 
 If you find any issues with the utility's documentation, please open that as an issue and I'll
