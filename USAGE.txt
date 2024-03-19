@@ -3,37 +3,35 @@ w11arm_esd2iso - a utility to build Windows 11 ARM installation ISOs from Micros
 SUMMARY
 =======
 
-This utility creates ISO installation media for Windows 11 ARM from 
-ESD files in Microsoft's software distribution infrastructure.
-The resulting ISO can be used to install Windows 11 ARM virtual machines on any
-virtualization solution that supports arm64 architectures such as VMware Fusion on
-Apple Silicon Macs. 
+This utility creates ISO installation media for Windows 11 ARM from ESD files in
+Microsoft's software distribution infrastructure. The resulting ISO can be used to
+install Windows 11 ARM virtual machines on any virtualization solution that supports
+arm64 architectures such as VMware Fusion on Apple Silicon Macs. 
 		
 USAGE
 =====
 
-	w11arm_esd2iso** [-v]
-	w11arm_esd2iso** [-v] -r *work-dir*
-	w11arm_esd2iso** [-Vh]
+	w11arm_esd2iso [-v]
+	w11arm_esd2iso [-v] -r *work-dir*
+	w11arm_esd2iso [-Vh]
 
 DESCRIPTION
 ===========
 
-In the first form, a Windows 11 ARM 22H2 ESD (Electronic 
-Software Distribution) file is downloaded from Microsoft,
-and converted to ISO.
+In the first form, a Windows 11 ARM ESD (Electronic Software Distribution) file
+is downloaded from Microsoft, and converted to ISO.
 	
-The utility will prompt for the type of ISO to produce 
-(either Home/Pro or Pro/Enterprise) and the language for the created ISO. A list of
-available languages will be provided to assist in making the ISO language selection. 
+The utility will prompt for the type of ISO to produce (either Home/Pro or Pro/Enterprise)
+and the language for the created ISO. A list of the available languages will be provided
+to assist in making the ISO language selection. 
 
 The generated ISO file is placed in the current working directory. The utility
 will display the name of the generated ISO file.
 
-In the second form, an interrupted network transfer of the ESD
-from Microsoft is resumed from the point of interruption and the ISO build process
-will continue. The *work-dir* argument is required, 
-and is expected to be a work directory created from a prior failed run of the utility.
+In the second form, an interrupted network transfer of the ESD from Microsoft is resumed
+from the point of interruption and the ISO build process will continue. The *work-dir*
+argument is required, and is expected to be a work directory created from a prior failed
+run of the utility.
 
 In the third form, the utility will either print out it's version or a synopsis of 
 command line options, and immediately exit without performing any ISO build.
@@ -61,7 +59,7 @@ DEPENDENCIES
 ============
 
 w11arm_esd2iso is written using the BASH shell, and should run on any reasonably current 
-macOS or Linux systems. It should run on Intel or arm64 architecture systems.
+macOS or Linux systems. It should run on both Intel and arm64 architecture systems.
 
 w11arm_esd2iso requires the followng utilities in order to create the ISO from the 
 Microsoft ESD file:
@@ -73,23 +71,20 @@ Microsoft ESD file:
 	* aria2c
 	* mkisofs
 
-IMPORTANT: Mac users beware. Unlike the versions found on the VMware Fusion Documents 
-           site, w11arm_esd2iso does not bundle any of these utilities. You'll need to 
-           install them yourself.
-
 For Mac Users
 -------------
 
-macOS already includes both xpath and shasum. The remaning packages will need to be 
-installed from Homebrew or MacPorts (or compile them yourself from their sources if you
-are so inclined).
+macOS includes both xpath and shasum. 
 
+IMPORTANT: w11arm_esd2iso does not bundle wimlib-imagex, cabextract, aria2c, or mkisofs.
+           You must install them yourself.
+           This is different than the versions that were found on the VMware site.
 
-To install from Homebrew:
+To install packages containing the required utilities from Homebrew:
 
 	brew install wimlib cabextract aria2 cdrtools
 
-To install from MacPorts:
+To install packages containing the required utilities from MacPorts:
 
 	sudo port install wimlib cabextract aria2 cdrtools
 
@@ -99,7 +94,7 @@ For Linux users
 Most of the utilities should be available in your distribution's repos.
 Install them using your package manager if not already installed. 
 
-The exact packages to install may vary between distros. If you don't know which packages 
+The exact packages to install will vary among distros. If you don't know which packages 
 contain the utility, many distros will give you a hint if you simply type the command 
 with no arguments. 
 
@@ -112,8 +107,8 @@ RETURN CODES
 NOTES
 =====
 
-w11arm_esd2iso only builds ISO media for Windows 11 ARM 22H2. It does not build media 
-for any other version of Windows or Windows Server.
+w11arm_esd2iso only builds ISO media for Windows 11 ARM. It does not build media for any
+other version of Windows or Windows Server.
 
 Have at least 12 GB of free disk space to run w11arm_esd2iso. Checks are performed for
 sufficient disk space and the utility will refuse to run if space isn't available.
@@ -134,6 +129,6 @@ more than once unless you have a really, really bad network connection. Each res
 attempt using the -r option will also resume a download from the point of interruption of 
 the last execution of the utility. 
 
-The downloaded ESD file will be validated against the SHA1 hash  provided by Microsoft. 
+The downloaded ESD file will be validated against the SHA1 hash provided by Microsoft. 
 If the verification fails (indicating a corrupt download), the utility will exit with an 
 error message.
