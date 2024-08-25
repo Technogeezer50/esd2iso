@@ -28,10 +28,14 @@ to assist in making the ISO language selection.
 The generated ISO file is placed in the current working directory. The utility
 will display the name of the generated ISO file.
 
-In the second form, an interrupted network transfer of the ESD from Microsoft is resumed
-from the point of interruption and the ISO build process will continue. The *work-dir*
-argument is required, and is expected to be a work directory created from a prior failed
-run of the utility.
+In the second form, a failed ISO creation due to an interrupted network download
+of the ESD from Microsoft will be restarted. The ESD download will be restarted
+from the point of the network interruption and the ISO creation process will continue
+once the download completes.
+
+For the second form, the *work-dir* argument is required, and is expected to refer to
+a directory containg temp files created by a prior failed execution of the utility.
+The utility checks to see that the folder contains the proper contents.  
 
 In the third form, the utility will either print out it's version or a synopsis of 
 command line options, and immediately exit without performing any ISO build.
@@ -39,20 +43,20 @@ command line options, and immediately exit without performing any ISO build.
 OPTIONS
 =======
 
-	-h				: Print a synopsis of usage and exit.
-	-r	*work-dir*	: Resume an interrupted ESD download using the information 
-					  from the work directory *work-dir*. 
-	-v				: Enable verbose output. 
-	-V				: Print the version of the utility and exit.
+	-h		: Print a synopsis of usage and exit.
+	-r *work-dir*	: Resume an interrupted ESD download using the information 
+			  from the work directory *work-dir*. 
+	-v		: Enable verbose output. 
+	-V		: Print the version of the utility and exit.
 
 
 FILES
 =====
 	./esd2iso_work.xxxxxx	: Work directory for ESD download and image creation, 
-							  created in the current working directory. The directory
-							  contains the downloaded ESD file and other files used during
-							  creation of the ISO. It will be deleted upon successful
-							  creation of the ISO.
+				  created in the current working directory. The directory
+				  contains the downloaded ESD file and other files used during
+				  creation of the ISO. It will be deleted upon successful
+				  creation of the ISO.
 
 
 DEPENDENCIES
@@ -101,7 +105,7 @@ with no arguments.
 RETURN CODES
 ============
 
-	0			: Successful creation of the ISO file
+	0		: Successful creation of the ISO file
 	Non-zero 	: Unsuccessful creation of the ISO file
 	
 NOTES
@@ -112,7 +116,6 @@ other version of Windows or Windows Server.
 
 Have at least 12 GB of free disk space to run w11arm_esd2iso. Checks are performed for
 sufficient disk space and the utility will refuse to run if space isn't available.
-available. 
 
 The work directory will be deleted upon successful ISO creation and when most errors are 
 encountered. It will not be deleted if a transfer of the ESD can be restarted using the
