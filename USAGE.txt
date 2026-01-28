@@ -111,7 +111,7 @@ RETURN CODES
 NOTES
 =====
 
-w11arm_esd2iso only builds ISO media for Windows 11 ARM. It does not build media for any
+w11arm_esd2iso only builds ISO media for Windows 11 ARM 25H2. It does not build media for any
 other version of Windows or Windows Server.
 
 Have at least 12 GB of free disk space to run w11arm_esd2iso. Checks are performed for
@@ -132,6 +132,6 @@ more than once unless you have a really, really bad network connection. Each res
 attempt using the -r option will also resume a download from the point of interruption of 
 the last execution of the utility. 
 
-The downloaded ESD file will be validated against the SHA1 hash provided by Microsoft. 
+The downloaded ESD file will be validated against the SHA256 hash provided by Microsoft. 
 If the verification fails (indicating a corrupt download), the utility will exit with an 
 error message.

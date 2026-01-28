@@ -2,7 +2,7 @@
 #
 # w11arm_esd2iso - download and convert Microsoft ESD files for Windows 11 ARM to ISO
 #
-# Copyright (C) 2023 Paul Rockwell
+# Copyright (C) 2023 - 2026 Paul Rockwell
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,11 +23,14 @@
 #
 
 
-readonly versionID="v5.0.3 (20240221)"
+readonly versionID="v5.1.0 (20260128)"
 readonly version="w11arm_esd2iso ${versionID}\n"
 readonly minDiskSpace=12
 readonly requires="wimlib-imagex aria2c cabextract mkisofs xpath shasum"
 readonly keepDownloads=0
+# readonly winCatalog="https://go.microsoft.com/fwlink?linkid=2156292"
+readonly winCatalog="http://tlu.dl.delivery.mp.microsoft.com/filestreamingservice/files/102da4c8-caa1-4a5c-ade9-4a2de3b91cab?P1=1769718543&P2=404&P3=2&P4=Mo%2byG%2fNbbZGSrOn04mSAZbm4gtNeiq%2bvz%2fnPUsRw6JM98CAZNpuH2tKUgKbSE5whVBRwjAoRTT%2bR%2bwyKGtSkxw%3d%3d"
+
 declare -a lTags
 declare -a lDesc
 declare esdURL
@@ -40,6 +43,7 @@ declare dOption=0
 declare shaHash=""
 declare runningOnDarwin=0
 declare tempDir="$(pwd)"
+
 
 usage() {
 	echo -e "Usage:\n"
@@ -93,7 +97,7 @@ printLanguages() {
     return 0
 }
 downloadCatalog() {
-	local -r winCatalog="https://go.microsoft.com/fwlink?linkid=2156292"
+	
 	
 	[[ -d ${wDir} ]] ||
 		abortProg 2 "Catalog download" "${wDir} is expected to exist but doesn't\nPlease report this error"
@@ -220,7 +224,7 @@ setupEsdDownload(){
 	xpath -q -n -e '//File[LanguageCode="'${esdLang}'"]' "${wDir}/w11arm_products.xml" >"${wDir}/esd_edition.xml"
 	esdURL=$(xpath -n -q -e '//FilePath' "${wDir}/esd_edition.xml" | sed -E -e 's/<[\/]?FilePath>//g')
 	buildName=$(xpath -n -q -e '//FileName' "${wDir}/esd_edition.xml"| sed -E -e 's/(<FileName>)|(\.esd<[\/]FileName>)//g')
-    shaHash=$(xpath -n -q -e '//Sha1' "${wDir}/esd_edition.xml" | sed -E -e 's/<[\/]?Sha1>//g')
+    shaHash=$(xpath -n -q -e '//Sha256' "${wDir}/esd_edition.xml" | sed -E -e 's/<[\/]?Sha256>//g')
 	
 	esdFile=${wDir}/${buildName}.esd
 	isoFile=./${buildName}.iso
@@ -590,7 +594,7 @@ downloadEsd ||
 rm "${wDir}/restartOK"
 
 echo -e "\nDownload complete. Validating download (this may take a minute or so)"
-calcHash=$(shasum "${esdFile}" | awk '{print $1}')
+calcHash=$(shasum --algorithm 256 "${esdFile}" | awk '{print $1}')
 debugOn && {
 	echo -e "[DEBUG] shaHash =  '${shaHash}'"
 	echo -e "        calcHash = '${calcHash}'"

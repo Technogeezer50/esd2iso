@@ -1,5 +1,11 @@
 CHANGELOG
 
+v5.1.0 (20260128)
+
+	Updated for Windows 11 25H2
+	New location of Microsoft Product Catalog download for Windows 11 25H2
+	Updated checksum calculation detection and algorithm due to Microsoft now using SHA256
+	
 v5.0.3 (20240221)
 
 	Strictly a housekeeping release - no functional changes.

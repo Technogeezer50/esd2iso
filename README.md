@@ -2,7 +2,7 @@
 
 ## What is w11arm_esd2iso?
 
-w11arm_esd2iso is a utility to build Windows 11 ARM installation ISOs from Microsoft ESD files.
+w11arm_esd2iso is a utility to build Windows 11 ARM 25H2 installation ISOs from Microsoft ESD files.
 It was born out of necessity for users of VMware Fusion on Apple Silicon Macs. They needed a way
 to easily obtain an installation ISO for Windows 11 ARM because Microsoft does not provide it
 via a public download.
@@ -79,7 +79,7 @@ See the file USAGE.txt that's included with the download.
 
 # Licensing
 
-w11arm_esd2iso is Copyright (C) 2023 Paul Rockwell and licensed under the terms of 
+w11arm_esd2iso is Copyright (C) 2023 - 2026 Paul Rockwell and licensed under the terms of 
 the GNU General Public License version 2.
 
 This program is distributed in the hope that it will be useful,
