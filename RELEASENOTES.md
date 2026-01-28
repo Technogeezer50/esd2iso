@@ -1,10 +1,16 @@
-# w11arm_esd2iso 5.0.3 Release Notes
+# w11arm_esd2iso 5.1.0 Release Notes
 
-w11arm_esd2iso | 5.0.3 build 20240221
+w11arm_esd2iso | 5.1.0 build 20260128
 
-v5.0.3 is a housekeeping update to w11arm_esd2iso v5.0.
+v5.1.0 is a minor release of w11arm_esd2iso.
 
 ## What's changed?
+
+### What's changed in 5.1.0
+
+* Updated for Windows 11 ARM 25H2.
+* Updated for new URL to Microsoft Product Catalog
+* ESD checksums are now calculated using SHA256 due to Microsoft product catalog changes.
 
 ### What's changed in 5.0.3
 
